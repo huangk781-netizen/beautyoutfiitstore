@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load order_extras %}
+
+{% block title %}訂單 #{{ order.id }} | beauty_outfits_store{% endblock %}
+
+{% block content %}
+<a href="{% url 'orders:order_list' %}" class="text-sm text-accent hover:underline">&larr; 返回訂單列表</a>
+
+<div class="mt-6 flex items-center justify-between gap-3">
+  <h1 class="text-2xl font-medium text-neutral">訂單 #{{ order.id }}</h1>
+  <span class="shrink-0 text-xs px-3 py-1 rounded-full {{ order.status|status_badge_class }}">
+    {{ order.get_status_display }}
+  </span>
+</div>
+<p class="mt-1 text-sm text-accent">{{ order.created_at|date:"Y/m/d H:i" }}</p>
+
+<div class="mt-8 space-y-2 text-sm">
+  <p class="text-neutral"><span class="text-accent">收件人：</span>{{ order.recipient_name }}（{{ order.recipient_phone }}）</p>
+  <p class="text-neutral"><span class="text-accent">收件地址：</span>{{ order.shipping_address }}</p>
+  <p class="text-neutral"><span class="text-accent">物流方式：</span>{{ order.get_shipping_method_display }}</p>
+  {% if order.store_name %}
+  <p class="text-neutral"><span class="text-accent">超商門市：</span>{{ order.store_name }}</p>
+  {% endif %}
+  <p class="text-neutral"><span class="text-accent">付款方式：</span>{{ order.get_payment_method_display }}</p>
+  {% if order.tracking_number %}
+  <p class="text-neutral"><span class="text-accent">託運單號：</span>{{ order.tracking_number }}</p>
+  {% endif %}
+  {% if order.return_reason %}
+  <p class="text-neutral"><span class="text-accent">退貨原因：</span>{{ order.return_reason }}</p>
+  {% endif %}
+</div>
+
+<div class="mt-8 space-y-4">
+  {% for item in order.items.all %}
+  <div class="flex items-center gap-4 border-b border-secondary pb-4">
+    <div class="w-16 h-20 rounded-lg overflow-hidden bg-secondary/50 flex items-center justify-center shrink-0">
+      {% if item.product_variant.product.image %}
+      <img src="{{ item.product_variant.product.image.url }}" alt="{{ item.product_variant.product.name }}" class="w-full h-full object-cover">
+      {% else %}
+      <span class="text-accent text-xs">無圖</span>
+      {% endif %}
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-neutral font-medium">{{ item.product_variant.product.name }}</p>
+      <p class="text-sm text-accent">{{ item.product_variant.get_size_display }} / {{ item.product_variant.color }} &times; {{ item.quantity }}</p>
+    </div>
+    <div class="text-neutral font-medium shrink-0">NT$ {{ item.subtotal|floatformat:0 }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="mt-6 pt-4 border-t border-secondary space-y-1 text-sm">
+  <div class="flex justify-between text-neutral">
+    <span>小計</span>
+    <span>NT$ {{ order.subtotal_amount|floatformat:0 }}</span>
+  </div>
+  {% if order.promotion_discount_amount %}
+  <div class="flex justify-between text-accent">
+    <span>滿額折扣{% if order.promotion %}（{{ order.promotion.name }}）{% endif %}</span>
+    <span>&minus;NT$ {{ order.promotion_discount_amount|floatformat:0 }}</span>
+  </div>
+  {% endif %}
+  {% if order.coupon_discount_amount %}
+  <div class="flex justify-between text-accent">
+    <span>優惠券折扣{% if order.coupon %}（{{ order.coupon.code }}）{% endif %}</span>
+    <span>&minus;NT$ {{ order.coupon_discount_amount|floatformat:0 }}</span>
+  </div>
+  {% endif %}
+  {% if order.points_discount_amount %}
+  <div class="flex justify-between text-accent">
+    <span>點數折抵（{{ order.points_used }} 點）</span>
+    <span>&minus;NT$ {{ order.points_discount_amount|floatformat:0 }}</span>
+  </div>
+  {% endif %}
+  {% if order.gift_description %}
+  <div class="flex justify-between text-neutral">
+    <span>贈品</span>
+    <span>{{ order.gift_description }}</span>
+  </div>
+  {% endif %}
+</div>
+
+<div class="mt-2 pt-2 border-t border-secondary flex justify-between items-center">
+  <span class="text-neutral font-medium">總金額</span>
+  <span class="text-xl font-medium text-accent">NT$ {{ order.total_amount|floatformat:0 }}</span>
+</div>
+
+{% if order.points_earned %}
+<p class="mt-2 text-sm text-accent text-right">此訂單已獲得 {{ order.points_earned }} 點</p>
+{% endif %}
+
+{% if order.status == 'completed' %}
+<div class="mt-8 border-t border-secondary pt-6">
+  <button
+    type="button"
+    id="show-return-form"
+    class="px-6 py-3 rounded-2xl border border-secondary text-neutral font-medium hover:border-accent transition-colors"
+  >
+    申請退貨
+  </button>
+
+  <form
+    method="post"
+    action="{% url 'orders:order_request_return' order.pk %}"
+    id="return-form"
+    class="hidden mt-4 space-y-3"
+  >
+    {% csrf_token %}
+    <label class="block text-sm font-medium text-neutral">退貨原因</label>
+    <textarea
+      name="reason"
+      rows="3"
+      required
+      placeholder="請簡述退貨原因，例如尺寸不合、瑕疵、與描述不符等"
+      class="w-full px-4 py-3 rounded-xl border border-secondary bg-base text-neutral focus:outline-none focus:border-accent"
+    ></textarea>
+    <button type="submit" class="px-6 py-3 rounded-2xl bg-accent text-base font-medium">
+      送出退貨申請
+    </button>
+  </form>
+</div>
+
+<script>
+  (function () {
+    var showBtn = document.getElementById('show-return-form');
+    var form = document.getElementById('return-form');
+    showBtn.addEventListener('click', function () {
+      form.classList.remove('hidden');
+      showBtn.classList.add('hidden');
+    });
+  })();
+</script>
+{% endif %}
+{% endblock %}

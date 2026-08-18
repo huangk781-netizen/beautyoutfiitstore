@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}會員中心 | beauty_outfits_store{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-medium text-neutral mb-8">會員中心</h1>
+
+<div class="rounded-2xl border border-secondary p-6">
+  <p class="text-sm text-accent">{{ member.username }}</p>
+
+  <div class="mt-3 flex items-center gap-3">
+    <span class="text-xs px-3 py-1 rounded-full font-medium
+      {% if member.tier == 'gold' %}bg-yellow-100 text-yellow-700
+      {% elif member.tier == 'silver' %}bg-gray-200 text-gray-600
+      {% elif member.tier == 'platinum' %}bg-purple-100 text-purple-700
+      {% else %}bg-orange-100 text-orange-700{% endif %}">
+      {{ member.get_tier_display }}
+    </span>
+    <span class="text-lg font-medium text-neutral">{{ member.points }} 點</span>
+  </div>
+
+  <p class="mt-4 text-sm text-neutral">累計消費金額（已完成訂單）：NT$ {{ total_spent|floatformat:0 }}</p>
+
+  {% if next_tier_label %}
+  <p class="mt-1 text-sm text-accent">
+    再消費 NT$ {{ amount_to_next_tier|floatformat:0 }} 即可升級為{{ next_tier_label }}
+  </p>
+  {% endif %}
+</div>
+
+<a
+  href="{% url 'orders:order_list' %}"
+  class="mt-6 inline-block px-6 py-3 rounded-2xl border border-secondary text-neutral font-medium hover:border-accent transition-colors"
+>
+  查看我的訂單
+</a>
+{% endblock %}

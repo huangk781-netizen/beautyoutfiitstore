@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load order_extras %}
+
+{% block title %}我的訂單 | beauty_outfits_store{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-medium text-neutral mb-8">我的訂單</h1>
+
+{% if orders %}
+<div class="space-y-4">
+  {% for order in orders %}
+  <a
+    href="{% url 'orders:order_detail' order.pk %}"
+    class="block rounded-2xl border border-secondary p-4 hover:border-accent transition-colors"
+  >
+    <div class="flex justify-between items-center gap-3">
+      <span class="font-medium text-neutral">訂單 #{{ order.id }}</span>
+      <span class="shrink-0 text-xs px-3 py-1 rounded-full {{ order.status|status_badge_class }}">
+        {{ order.get_status_display }}
+      </span>
+    </div>
+    <div class="mt-2 flex justify-between items-center text-sm">
+      <span class="text-accent">{{ order.created_at|date:"Y/m/d H:i" }}</span>
+      <span class="text-neutral font-medium">NT$ {{ order.total_amount|floatformat:0 }}</span>
+    </div>
+    {% if order.tracking_number %}
+    <p class="mt-2 text-xs text-accent">託運單號：{{ order.tracking_number }}</p>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-16">
+  <p class="text-accent">目前還沒有訂單</p>
+  <a href="{% url 'products:product_list' %}" class="mt-6 inline-block px-8 py-3 rounded-2xl bg-accent text-base font-medium">
+    去逛逛
+  </a>
+</div>
+{% endif %}
+{% endblock %}

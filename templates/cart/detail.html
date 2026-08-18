@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}購物車 | beauty_outfits_store{% endblock %}
+
+{% block content %}
+<a href="{% url 'products:product_list' %}" class="text-sm text-accent hover:underline">&larr; 回首頁</a>
+
+<h1 class="mt-4 text-2xl font-medium text-neutral mb-8">購物車</h1>
+
+{% if cart|length == 0 %}
+<div class="text-center py-16">
+  <p class="text-accent">購物車目前是空的</p>
+  <a
+    href="{% url 'products:product_list' %}"
+    class="mt-6 inline-block px-8 py-3 rounded-2xl bg-accent text-base font-medium"
+  >
+    繼續選購
+  </a>
+</div>
+{% else %}
+<div class="space-y-6">
+  {% for item in cart %}
+  <div class="flex gap-4 border-b border-secondary pb-6">
+    <a
+      href="{% url 'products:product_detail' item.variant.product.pk %}"
+      class="shrink-0 w-24 h-32 rounded-xl overflow-hidden bg-secondary/50 flex items-center justify-center"
+    >
+      {% if item.variant.product.image %}
+      <img
+        src="{{ item.variant.product.image.url }}"
+        alt="{{ item.variant.product.name }}"
+        class="w-full h-full object-cover"
+      >
+      {% else %}
+      <span class="text-accent text-xs">尚無圖片</span>
+      {% endif %}
+    </a>
+
+    <div class="flex-1 min-w-0">
+      <a
+        href="{% url 'products:product_detail' item.variant.product.pk %}"
+        class="font-medium text-neutral"
+      >
+        {{ item.variant.product.name }}
+      </a>
+      <p class="mt-1 text-sm text-accent">{{ item.variant.get_size_display }} / {{ item.variant.color }}</p>
+      <p class="mt-1 text-sm text-neutral/70">NT$ {{ item.price|floatformat:0 }}</p>
+
+      <div class="mt-3 flex items-center gap-3">
+        <form method="post" action="{% url 'cart:cart_decrease' item.variant.id %}">
+          {% csrf_token %}
+          <button
+            type="submit"
+            aria-label="減少數量"
+            class="w-9 h-9 rounded-lg border border-secondary text-neutral text-lg leading-none flex items-center justify-center hover:border-accent transition-colors"
+          >
+            &minus;
+          </button>
+        </form>
+
+        <span class="w-6 text-center text-neutral">{{ item.quantity }}</span>
+
+        <form method="post" action="{% url 'cart:cart_increase' item.variant.id %}">
+          {% csrf_token %}
+          <button
+            type="submit"
+            aria-label="增加數量"
+            class="w-9 h-9 rounded-lg border border-secondary text-neutral text-lg leading-none flex items-center justify-center hover:border-accent transition-colors"
+          >
+            +
+          </button>
+        </form>
+
+        <form method="post" action="{% url 'cart:cart_remove' item.variant.id %}" class="ml-auto">
+          {% csrf_token %}
+          <button type="submit" class="text-sm text-accent hover:underline">移除</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="shrink-0 text-right font-medium text-neutral">
+      NT$ {{ item.subtotal|floatformat:0 }}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="mt-8 flex items-center justify-between border-t border-secondary pt-6">
+  <span class="text-lg font-medium text-neutral">總金額</span>
+  <span class="text-xl font-medium text-accent">NT$ {{ cart.total_price|floatformat:0 }}</span>
+</div>
+
+<a
+  href="{% url 'orders:checkout' %}"
+  class="mt-6 block w-full text-center px-8 py-4 rounded-2xl bg-accent text-base font-medium"
+>
+  前往結帳
+</a>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,16 @@
+asgiref==3.12.1
+certifi==2026.7.22
+charset-normalizer==3.4.9
+Django==6.1
+django-allauth==65.19.0
+django-environ==0.14.0
+gunicorn==26.0.0
+idna==3.18
+mysqlclient==2.2.8
+packaging==26.3
+pillow==12.3.0
+requests==2.34.2
+sqlparse==0.5.5
+tzdata==2026.3
+urllib3==2.7.0
+whitenoise==6.12.0

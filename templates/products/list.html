@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}商品列表 | beauty_outfits_store{% endblock %}
+
+{% block content %}
+<div class="mb-8 sm:mb-10 flex flex-wrap gap-3">
+  <a
+    href="{% url 'products:product_list' %}"
+    class="px-4 py-2 rounded-xl text-sm font-medium transition-colors
+      {% if not selected_category %}bg-accent text-base{% else %}bg-secondary/60 text-neutral hover:bg-secondary{% endif %}"
+  >
+    全部
+  </a>
+  {% for category in categories %}
+  <a
+    href="?category={{ category.slug }}"
+    class="px-4 py-2 rounded-xl text-sm font-medium transition-colors
+      {% if selected_category == category.slug %}bg-accent text-base{% else %}bg-secondary/60 text-neutral hover:bg-secondary{% endif %}"
+  >
+    {{ category.name }}
+  </a>
+  {% endfor %}
+</div>
+
+<div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+  {% for product in products %}
+  <a href="{% url 'products:product_detail' product.pk %}" class="group block">
+    <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-secondary/50 flex items-center justify-center">
+      {% if product.image %}
+      <img
+        src="{{ product.image.url }}"
+        alt="{{ product.name }}"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+      >
+      {% else %}
+      <span class="text-accent text-sm">尚無圖片</span>
+      {% endif %}
+    </div>
+    <h3 class="mt-3 font-medium text-neutral">{{ product.name }}</h3>
+    <p class="mt-1 text-accent">NT$ {{ product.price|floatformat:0 }}</p>
+  </a>
+  {% empty %}
+  <p class="col-span-full text-center text-accent py-16">目前尚無上架商品</p>
+  {% endfor %}
+</div>
+{% endblock %}

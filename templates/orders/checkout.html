@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}結帳 | beauty_outfits_store{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-medium text-neutral mb-8">結帳</h1>
+
+{% if errors %}
+<div class="mb-6 space-y-2">
+  {% for error in errors %}
+  <div class="px-4 py-3 rounded-xl text-sm bg-accent/20 text-accent">{{ error }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="mb-10">
+  <h2 class="text-sm font-medium text-neutral mb-4">訂單內容（唯讀）</h2>
+  <div class="space-y-4">
+    {% for item in cart %}
+    <div class="flex items-center gap-3 text-sm">
+      <div class="w-14 h-[4.5rem] rounded-lg overflow-hidden bg-secondary/50 flex items-center justify-center shrink-0">
+        {% if item.variant.product.image %}
+        <img src="{{ item.variant.product.image.url }}" alt="{{ item.variant.product.name }}" class="w-full h-full object-cover">
+        {% else %}
+        <span class="text-accent text-[0.6rem]">無圖</span>
+        {% endif %}
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-neutral font-medium truncate">{{ item.variant.product.name }}</p>
+        <p class="text-accent">{{ item.variant.get_size_display }} / {{ item.variant.color }} &times; {{ item.quantity }}</p>
+      </div>
+      <div class="text-neutral font-medium shrink-0">NT$ {{ item.subtotal|floatformat:0 }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if promotion_rule %}
+  <div class="mt-4 px-4 py-3 rounded-xl text-sm bg-secondary/50 text-neutral">
+    已達滿額優惠「{{ promotion_rule.name }}」，折抵 NT$ {{ promotion_discount|floatformat:0 }}
+  </div>
+  {% endif %}
+  {% if gift_rule %}
+  <div class="mt-2 px-4 py-3 rounded-xl text-sm bg-secondary/50 text-neutral">
+    訂單滿 NT$ {{ gift_rule.min_spend|floatformat:0 }}，加贈{% if gift_rule.free_gift_product %}「{{ gift_rule.free_gift_product.name }}」{% else %}贈品{% endif %}（出貨時附上）
+  </div>
+  {% endif %}
+
+  <div class="mt-4 pt-4 border-t border-secondary space-y-1 text-sm">
+    <div class="flex justify-between text-neutral">
+      <span>小計</span>
+      <span>NT$ {{ subtotal|floatformat:0 }}</span>
+    </div>
+    {% if promotion_discount %}
+    <div class="flex justify-between text-accent">
+      <span>滿額折扣</span>
+      <span>&minus;NT$ {{ promotion_discount|floatformat:0 }}</span>
+    </div>
+    {% endif %}
+    {% if coupon_discount %}
+    <div class="flex justify-between text-accent">
+      <span>優惠券折扣（{{ coupon.code }}）</span>
+      <span>&minus;NT$ {{ coupon_discount|floatformat:0 }}</span>
+    </div>
+    {% endif %}
+    {% if points_discount %}
+    <div class="flex justify-between text-accent">
+      <span>點數折抵（{{ points_to_use }} 點）</span>
+      <span>&minus;NT$ {{ points_discount|floatformat:0 }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="mt-2 pt-2 border-t border-secondary flex justify-between items-center">
+    <span class="text-neutral font-medium">應付金額</span>
+    <span class="text-accent text-lg font-medium">NT$ {{ total_amount|floatformat:0 }}</span>
+  </div>
+
+  <a href="{% url 'cart:cart_detail' %}" class="mt-3 inline-block text-sm text-accent hover:underline">
+    修改購物車內容
+  </a>
+</div>
+
+<form method="post" class="space-y-8">
+  {% csrf_token %}
+  <input type="hidden" name="checkout_action" id="checkout-action-field" value="place_order">
+
+  <div>
+    <p class="text-sm font-medium text-neutral mb-2">優惠券</p>
+    <div class="flex gap-3">
+      <input
+        type="text" name="coupon_code" value="{{ coupon_code }}" placeholder="輸入優惠碼"
+        class="flex-1 px-4 py-3 rounded-xl border border-secondary bg-base text-neutral focus:outline-none focus:border-accent"
+      >
+      <button
+        type="submit"
+        onclick="document.getElementById('checkout-action-field').value='apply_coupon'"
+        class="px-5 py-3 rounded-xl border border-secondary text-neutral font-medium hover:border-accent transition-colors shrink-0"
+      >
+        套用
+      </button>
+    </div>
+  </div>
+
+  {% if member_points > 0 %}
+  <div>
+    <label class="flex items-center gap-3 cursor-pointer">
+      <input
+        type="checkbox" name="use_points" {% if use_points %}checked{% endif %}
+        onchange="document.getElementById('checkout-action-field').value='apply_coupon'; this.form.requestSubmit();"
+        class="w-5 h-5 accent-[#D67D9C]"
+      >
+      <span class="text-sm text-neutral">
+        使用點數折抵（目前有 {{ member_points }} 點，每 {{ points_redeem_rate|floatformat:0 }} 點折 NT$1）
+      </span>
+    </label>
+  </div>
+  {% endif %}
+
+  <div class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-neutral mb-1">收件人姓名</label>
+      <input
+        type="text" name="recipient_name" value="{{ form_data.recipient_name }}"
+        class="w-full px-4 py-3 rounded-xl border border-secondary bg-base text-neutral focus:outline-none focus:border-accent"
+      >
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-neutral mb-1">收件人電話</label>
+      <input
+        type="tel" inputmode="numeric" name="recipient_phone" value="{{ form_data.recipient_phone }}"
+        class="w-full px-4 py-3 rounded-xl border border-secondary bg-base text-neutral focus:outline-none focus:border-accent"
+      >
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-neutral mb-1">收件地址</label>
+      <input
+        type="text" name="shipping_address" value="{{ form_data.shipping_address }}"
+        class="w-full px-4 py-3 rounded-xl border border-secondary bg-base text-neutral focus:outline-none focus:border-accent"
+      >
+    </div>
+  </div>
+
+  <div>
+    <p class="text-sm font-medium text-neutral mb-2">物流方式</p>
+    <div class="grid grid-cols-2 gap-3">
+      {% for value, label in shipping_methods %}
+      <label class="cursor-pointer">
+        <input
+          type="radio" name="shipping_method" value="{{ value }}" class="shipping-method-radio peer sr-only"
+          {% if form_data.shipping_method == value %}checked{% endif %}
+        >
+        <span class="block px-4 py-3 rounded-xl border border-secondary text-center text-sm font-medium text-neutral peer-checked:bg-accent peer-checked:text-base peer-checked:border-accent transition-colors">
+          {{ label }}
+        </span>
+      </label>
+      {% endfor %}
+    </div>
+
+    <div id="store-name-field" class="mt-4 hidden">
+      <label class="block text-sm font-medium text-neutral mb-1">超商門市名稱</label>
+      <input
+        type="text" name="store_name" value="{{ form_data.store_name }}" placeholder="例如：7-11 松仁門市"
+        class="w-full px-4 py-3 rounded-xl border border-secondary bg-base text-neutral focus:outline-none focus:border-accent"
+      >
+    </div>
+  </div>
+
+  <div>
+    <p class="text-sm font-medium text-neutral mb-2">付款方式</p>
+    <div class="grid grid-cols-2 gap-3">
+      {% for value, label in payment_methods %}
+      <label class="cursor-pointer">
+        <input
+          type="radio" name="payment_method" value="{{ value }}" class="peer sr-only"
+          {% if form_data.payment_method == value %}checked{% endif %}
+        >
+        <span class="block px-4 py-3 rounded-xl border border-secondary text-center text-sm font-medium text-neutral peer-checked:bg-accent peer-checked:text-base peer-checked:border-accent transition-colors">
+          {{ label }}
+        </span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <button type="submit" class="w-full px-8 py-4 rounded-2xl bg-accent text-base font-medium">
+    送出訂單
+  </button>
+</form>
+
+<script>
+  (function () {
+    var radios = document.querySelectorAll('.shipping-method-radio');
+    var storeField = document.getElementById('store-name-field');
+    var storeInput = storeField.querySelector('input[name="store_name"]');
+
+    function refresh() {
+      var selected = document.querySelector('.shipping-method-radio:checked');
+      var isConvenienceStore = selected && selected.value === 'convenience_store';
+      storeField.classList.toggle('hidden', !isConvenienceStore);
+    }
+
+    radios.forEach(function (radio) {
+      radio.addEventListener('change', refresh);
+    });
+
+    refresh();
+  })();
+</script>
+{% endblock %}

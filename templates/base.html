@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}beauty_outfits_store{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+</head>
+<body class="bg-base text-neutral font-sans antialiased min-h-screen flex flex-col">
+  <header class="sticky top-0 z-10 bg-base/90 backdrop-blur border-b border-secondary">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="{% url 'products:product_list' %}" class="p-2 -ml-2 text-neutral" aria-label="回首頁">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.5 1.5 0 012.122 0L22.28 12M4.5 9.75V21a.75.75 0 00.75.75H9.75v-6a1.5 1.5 0 011.5-1.5h1.5a1.5 1.5 0 011.5 1.5v6h4.5a.75.75 0 00.75-.75V9.75" />
+          </svg>
+        </a>
+        <a href="{% url 'products:product_list' %}" class="text-base sm:text-lg font-medium tracking-wide text-neutral">
+          beauty_outfits_store
+        </a>
+      </div>
+
+      <div class="flex items-center gap-3 sm:gap-4">
+        {% if user.is_authenticated %}
+        <a href="{% url 'accounts:profile' %}" class="text-sm text-neutral hover:text-accent transition-colors">
+          會員中心
+        </a>
+        <a href="{% url 'orders:order_list' %}" class="text-sm text-neutral hover:text-accent transition-colors">
+          訂單
+        </a>
+        <form method="post" action="{% url 'accounts:logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="text-sm text-accent hover:underline">登出</button>
+        </form>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="text-sm text-neutral hover:text-accent transition-colors">登入</a>
+        <a href="{% url 'accounts:register' %}" class="text-sm text-accent hover:underline">註冊</a>
+        {% endif %}
+
+        <a href="{% url 'cart:cart_detail' %}" class="relative p-2 -mr-2 text-neutral" aria-label="購物車">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 9V7a6 6 0 1112 0v2M4 9h16l-1.2 11.2a2 2 0 01-2 1.8H7.2a2 2 0 01-2-1.8L4 9z" />
+          </svg>
+          {% if cart|length > 0 %}
+          <span class="absolute -top-0.5 -right-0.5 min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-accent text-base text-[0.65rem] font-medium flex items-center justify-center">
+            {{ cart|length }}
+          </span>
+          {% endif %}
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+      {% for message in messages %}
+      <div class="px-4 py-3 rounded-xl text-sm bg-secondary/70 text-neutral">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="border-t border-secondary py-8 text-center text-sm text-accent">
+    &copy; 2026 beauty_outfits_store
+  </footer>
+</body>
+</html>

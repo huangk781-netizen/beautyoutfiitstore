@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | beauty_outfits_store{% endblock %}
+
+{% block content %}
+<a href="{% url 'products:product_list' %}" class="text-sm text-accent hover:underline">&larr; 返回商品列表</a>
+
+<div class="mt-6 grid md:grid-cols-2 gap-8 md:gap-12">
+  <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-secondary/50 flex items-center justify-center">
+    {% if product.image %}
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+    {% else %}
+    <span class="text-accent text-sm">尚無圖片</span>
+    {% endif %}
+  </div>
+
+  <div>
+    <p class="text-sm text-accent">{{ product.category.name }}</p>
+    <h1 class="mt-2 text-2xl font-medium text-neutral">{{ product.name }}</h1>
+    <p class="mt-3 text-xl text-accent">NT$ {{ product.price|floatformat:0 }}</p>
+
+    {% if product.description %}
+    <p class="mt-6 text-neutral/80 leading-relaxed whitespace-pre-line">{{ product.description }}</p>
+    {% endif %}
+
+    {{ variants_data|json_script:"variants-data" }}
+
+    <div class="mt-8 space-y-6" id="variant-selector">
+      <div>
+        <p class="text-sm font-medium text-neutral mb-2">尺寸</p>
+        <div class="flex flex-wrap gap-2" id="size-options">
+          {% for size in sizes %}
+          <button
+            type="button"
+            data-size="{{ size.code }}"
+            class="variant-btn size-btn px-4 py-2 rounded-xl border border-secondary text-sm font-medium text-neutral transition-colors"
+          >
+            {{ size.display }}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div>
+        <p class="text-sm font-medium text-neutral mb-2">顏色</p>
+        <div class="flex flex-wrap gap-2" id="color-options">
+          {% for color in colors %}
+          <button
+            type="button"
+            data-color="{{ color }}"
+            class="variant-btn color-btn px-4 py-2 rounded-xl border border-secondary text-sm font-medium text-neutral transition-colors"
+          >
+            {{ color }}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <p id="stock-status" class="text-sm text-accent min-h-[1.25rem]"></p>
+    </div>
+
+    <div class="mt-8">
+      <p class="text-sm font-medium text-neutral mb-2">數量</p>
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          id="quantity-decrease"
+          aria-label="減少數量"
+          class="w-10 h-10 rounded-lg border border-secondary text-neutral text-lg leading-none flex items-center justify-center hover:border-accent transition-colors"
+        >
+          &minus;
+        </button>
+        <span id="quantity-display" class="w-8 text-center text-neutral">1</span>
+        <button
+          type="button"
+          id="quantity-increase"
+          aria-label="增加數量"
+          class="w-10 h-10 rounded-lg border border-secondary text-neutral text-lg leading-none flex items-center justify-center hover:border-accent transition-colors"
+        >
+          +
+        </button>
+      </div>
+    </div>
+
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'cart:cart_add' %}">
+      {% csrf_token %}
+      <input type="hidden" name="variant_id" id="selected-variant-id" value="">
+      <input type="hidden" name="quantity" id="selected-quantity" value="1">
+      <button
+        type="submit"
+        id="add-to-cart"
+        disabled
+        class="mt-6 w-full sm:w-auto px-8 py-3 rounded-2xl bg-accent text-base font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+      >
+        加入購物車
+      </button>
+    </form>
+    {% else %}
+    <a
+      href="{% url 'accounts:login' %}?next={{ request.path }}"
+      class="mt-6 block w-full sm:w-auto text-center px-8 py-3 rounded-2xl bg-accent text-base font-medium"
+    >
+      登入後即可加入購物車
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<script src="{% static 'js/product-detail.js' %}?v=4"></script>
+{% endblock %}

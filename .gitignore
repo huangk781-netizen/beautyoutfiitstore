@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Django
+db.sqlite3
+staticfiles/
+media/
+*.log
+
+# 環境變數（機密資訊，不要提交）
+.env
+
+# Node / Tailwind
+node_modules/
+
+# 編輯器 / 工具
+.vscode/
+.idea/
+.claude/

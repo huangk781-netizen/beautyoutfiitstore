@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}訂單完成 | beauty_outfits_store{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto text-center py-8">
+  <div class="w-16 h-16 mx-auto rounded-full bg-accent/20 flex items-center justify-center">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-8 h-8 text-accent">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+    </svg>
+  </div>
+
+  <h1 class="mt-6 text-2xl font-medium text-neutral">訂單已成立</h1>
+  <p class="mt-2 text-sm text-accent">訂單編號 #{{ order.id }}</p>
+
+  {% if order.payment_method == 'bank_transfer' %}
+  <div class="mt-8 text-left bg-secondary/40 rounded-2xl p-6 space-y-2">
+    <p class="text-sm font-medium text-neutral">請匯款至以下帳戶</p>
+    <p class="text-neutral">陽春銀行 (700)</p>
+    <p class="text-neutral tracking-wide">123-456-789012</p>
+    <p class="mt-4 text-sm text-accent leading-relaxed">
+      匯款後請聯繫客服並告知匯款帳號末五碼，我們確認後會盡快為您安排出貨。
+    </p>
+  </div>
+  {% else %}
+  <div class="mt-8 bg-secondary/40 rounded-2xl p-6">
+    <p class="text-neutral">您的訂單已成立，將由物流人員代收現金。</p>
+  </div>
+  {% endif %}
+
+  <div class="mt-8 flex flex-col gap-3">
+    <a href="{% url 'orders:order_detail' order.pk %}" class="px-8 py-3 rounded-2xl bg-accent text-base font-medium">
+      查看訂單詳情
+    </a>
+    <a href="{% url 'products:product_list' %}" class="px-8 py-3 rounded-2xl border border-secondary text-neutral font-medium">
+      繼續選購
+    </a>
+  </div>
+</div>
+{% endblock %}
