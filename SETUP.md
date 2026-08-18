@@ -6,6 +6,7 @@
 - 資料庫：預設 SQLite（開發階段），檔案位置 `db.sqlite3`；設定 `DATABASE_URL` 環境變數即可切換 MySQL（不用改程式碼，見下方「部署到 Railway」）
 - 專案設定：`config/settings.py`（機密資訊已改為讀環境變數，見下方「環境變數」）
 - Apps：`accounts`（會員/註冊登入）、`products`（商品）、`orders`（訂單/結帳）、`cart`（購物車，session 儲存，不需要資料表）、`marketing`（優惠券/滿額活動/會員公告）
+- GitHub：https://github.com/huangk781-netizen/beautyoutfiitstore （分支 `main`，本機 git 身份只在這個 repo 內設定，沒有動全域設定）
 
 ## 管理員帳號（Django Admin）
 - 網址：http://127.0.0.1:8000/admin/
@@ -138,14 +139,13 @@ npm run watch:css
 - `whitenoise`：讓 Django 自己就能在正式環境提供 CSS/JS 靜態檔案，不用額外設定 Nginx 或 CDN
 - 資料庫設定已經是讀 `DATABASE_URL` 環境變數，Railway 開一個 MySQL 服務後會自動產生這個變數（或你手動複製貼上到 Django 服務的環境變數也可以）
 
+**已經完成：** 專案已經 `git init` 並推上 GitHub：https://github.com/huangk781-netizen/beautyoutfiitstore （分支 `main`）
+
 **你需要自己做的事：**
 1. 申請 [Railway](https://railway.app/) 帳號（可以用 GitHub 登入）
-2. 這個專案目前還沒有 Git（沒有 `git init` 過），Railway 通常會從 GitHub repo 部署，所以你會需要：
-   - 先幫這個資料夾做 `git init`、建立 GitHub repo、把程式碼推上去（我可以幫你做這一步，跟我說一聲）
-   - 或是用 Railway CLI 直接從本機資料夾部署（不用先上 GitHub）
-3. 在 Railway 建立新專案，加一個 MySQL 服務（Railway 的「Add Database」裡選 MySQL）
-4. 加一個從 GitHub repo（或 CLI）部署的 Django 服務
-5. 在 Django 服務的「Variables」頁籤設定環境變數，至少要有：
+2. 在 Railway 建立新專案，選「Deploy from GitHub repo」，選這個 repo
+3. 再加一個 MySQL 服務（Railway 的「Add Database」裡選 MySQL）
+4. 在 Django 服務的「Variables」頁籤設定環境變數，至少要有：
    - `SECRET_KEY`：換一組新的隨機字串（不要用開發環境那組）
    - `DEBUG`：`False`
    - `ALLOWED_HOSTS`：Railway 會給你一個 `xxx.up.railway.app` 網域，填進去（之後綁自訂網域再加上去）
