@@ -17,7 +17,11 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            auth_login(request, user)
+            auth_login(
+                request,
+                user,
+                backend='django.contrib.auth.backends.ModelBackend',
+            )
             return redirect(next_url or 'products:product_list')
     else:
         form = RegisterForm()
