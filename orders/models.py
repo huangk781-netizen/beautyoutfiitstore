@@ -107,7 +107,7 @@ class Order(models.Model):
         if not member.email:
             return
 
-        subject = f'【beauty_outfits_store】您的訂單 #{self.pk} 已出貨'
+        subject = f'【dudu_outfits_store】您的訂單 #{self.pk} 已出貨'
         message = (
             f'{member.username} 您好，\n\n'
             f'您的訂單 #{self.pk} 已出貨，出貨明細如下：\n\n'
@@ -115,7 +115,7 @@ class Order(models.Model):
             f'物流方式：{self.get_shipping_method_display()}\n'
             f'收件人：{self.recipient_name}（{self.recipient_phone}）\n'
             f'收件地址：{self.shipping_address}\n\n'
-            f'感謝您在 beauty_outfits_store 購物！'
+            f'感謝您在 dudu_outfits_store 購物！'
         )
         send_mail(
             subject=subject,

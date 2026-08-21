@@ -41,7 +41,7 @@ class AnnouncementAdmin(admin.ModelAdmin):
                 members = members.filter(tier=announcement.target_tier)
 
             sent_count = 0
-            subject = f'【beauty_outfits_store】{announcement.title}'
+            subject = f'【dudu_outfits_store】{announcement.title}'
             for email in members.values_list('email', flat=True):
                 # 逐一寄送（而非一次塞進同一封信的收件人清單），避免會員互相看到彼此的 Email
                 send_mail(
