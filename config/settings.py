@@ -120,12 +120,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-# 開發階段沒設 DATABASE_URL 時預設用 SQLite。正式環境（例如 Railway）只要設定
-# DATABASE_URL 環境變數（例如 mysql://user:password@host:3306/dbname），
-# 不用改任何程式碼就會自動切換成 MySQL，需要搭配 mysqlclient 套件（已在 requirements.txt）。
+# 開發階段沒設資料庫 URL 時預設用 SQLite。正式環境（例如 Railway）可設定
+# DATABASE_URL，或直接使用 Railway MySQL 服務提供的 MYSQL_URL。
+database_url = env(
+    'DATABASE_URL',
+    default=env('MYSQL_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
+)
 
 DATABASES = {
-    'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}')
+    'default': env.db_url(database_url)
 }
 
 

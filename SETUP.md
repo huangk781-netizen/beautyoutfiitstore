@@ -1,9 +1,9 @@
 # 開發環境設定與啟動說明
 
 ## 環境資訊
-- Python 3.13.7
+- Python 3.13
 - Django 6.1（安裝於專案內的虛擬環境 `venv/`）
-- 資料庫：預設 SQLite（開發階段），檔案位置 `db.sqlite3`；設定 `DATABASE_URL` 環境變數即可切換 MySQL（不用改程式碼，見下方「部署到 Railway」）
+- 資料庫：預設 SQLite（開發階段），檔案位置 `db.sqlite3`；設定 `DATABASE_URL` 或 Railway MySQL 的 `MYSQL_URL` 環境變數即可切換 MySQL（不用改程式碼，見下方「部署到 Railway」）
 - 專案設定：`config/settings.py`（機密資訊已改為讀環境變數，見下方「環境變數」）
 - Apps：`accounts`（會員/註冊登入）、`products`（商品）、`orders`（訂單/結帳）、`cart`（購物車，session 儲存，不需要資料表）、`marketing`（優惠券/滿額活動/會員公告）
 - GitHub：https://github.com/huangk781-netizen/beautyoutfiitstore （分支 `main`，本機 git 身份只在這個 repo 內設定，沒有動全域設定）
@@ -96,7 +96,7 @@ python manage.py createsuperuser
 ## 目前進度（第四階段：優化與上線準備）
 - [x] Email 通知：訂單狀態變「已出貨」時自動寄信給會員（開發階段用 console backend，信件內容會印在跑 `runserver` 的終端機視窗，不會真的寄出）；後台「會員公告」（`marketing.Announcement`）可選會員等級（或全部會員）建立公告，用批次動作「發送通知」逐一寄信（不會讓會員互相看到彼此 Email）
 - [x] 銷售儀表板 `/dashboard/`（僅限後台管理員，一般會員/訪客會被導去登入頁）：本月銷售額、本月訂單數、近 7 天每日銷售額、熱銷商品前 10 名
-- [x] 部署準備：機密資訊全部改讀環境變數（`django-environ`）、`requirements.txt`、`Procfile`、`runtime.txt`、`whitenoise` 處理正式環境靜態檔案、MySQL 連線已備妥（只需設定 `DATABASE_URL`）
+- [x] 部署準備：機密資訊全部改讀環境變數（`django-environ`）、`requirements.txt`、`Procfile`、`runtime.txt`、`whitenoise` 處理正式環境靜態檔案、MySQL 連線已備妥（設定 `MYSQL_URL` 或 `DATABASE_URL`）
 - [ ] 商品評論：使用者決定不需要這項功能，跳過
 - [ ] LINE 官方帳號、IG 自動回覆：使用者決定等網站正式上線、有實際訂單量後再評估
 
@@ -128,16 +128,16 @@ npm run watch:css
 - **想自訂本機設定**：複製 `.env.example` 另存成 `.env`，改裡面的值即可（`.env` 已加入 `.gitignore`，不會被提交）。
 - **正式環境**：不需要 `.env` 檔案，直接在 PaaS 平台（例如 Railway）的環境變數頁面設定即可，程式會自動讀到。
 
-主要變數說明都寫在 [.env.example](.env.example) 裡，包含 `SECRET_KEY`、`DEBUG`、`ALLOWED_HOSTS`、`DATABASE_URL`、Email 相關設定。
+主要變數說明都寫在 [.env.example](.env.example) 裡，包含 `SECRET_KEY`、`DEBUG`、`ALLOWED_HOSTS`、`DATABASE_URL` / `MYSQL_URL`、Email 相關設定。
 
 ## 部署到 Railway（PaaS）前的準備
 
 **專案端已經準備好的東西：**
 - `requirements.txt`：所有 Python 套件清單（`pip freeze` 產生）
 - `Procfile`：告訴 Railway 怎麼啟動網站，內容是「先跑 migration → 收集靜態檔案 → 用 gunicorn 啟動」
-- `runtime.txt`：指定 Python 版本（3.13.7）
+- `runtime.txt`：指定 Python 版本（3.13）
 - `whitenoise`：讓 Django 自己就能在正式環境提供 CSS/JS 靜態檔案，不用額外設定 Nginx 或 CDN
-- 資料庫設定已經是讀 `DATABASE_URL` 環境變數，Railway 開一個 MySQL 服務後會自動產生這個變數（或你手動複製貼上到 Django 服務的環境變數也可以）
+- 資料庫設定已經是讀 `DATABASE_URL` 或 `MYSQL_URL` 環境變數，Railway 開一個 MySQL 服務後可使用 `MYSQL_URL`（或你手動複製貼上到 Django 服務的環境變數也可以）
 
 **已經完成：** 專案已經 `git init` 並推上 GitHub：https://github.com/huangk781-netizen/beautyoutfiitstore （分支 `main`）
 
@@ -149,7 +149,7 @@ npm run watch:css
    - `SECRET_KEY`：換一組新的隨機字串（不要用開發環境那組）
    - `DEBUG`：`False`
    - `ALLOWED_HOSTS`：Railway 會給你一個 `xxx.up.railway.app` 網域，填進去（之後綁自訂網域再加上去）
-   - `DATABASE_URL`：如果 Railway 沒有自動幫你把 MySQL 服務的連線字串注入到 Django 服務，就手動從 MySQL 服務的 Variables 頁籤複製過來
+   - `MYSQL_URL` 或 `DATABASE_URL`：從 MySQL 服務的 Variables 頁籤複製 `MYSQL_URL` 到 Django 服務；若你想沿用 `DATABASE_URL` 名稱，也可以把同一串值貼成 `DATABASE_URL`
    - Email 相關（如果要真的寄信，見 `.env.example` 裡的 SendGrid 範例；不設的話會維持 console backend，正式環境不會真的寄信但也不會出錯）
 6. 部署後，商品圖片這類使用者上傳的檔案要注意：Railway 的檔案系統每次重新部署會清空，正式環境建議之後改接雲端儲存（例如 S3），這個階段先不用處理，只是提醒你別太早上傳重要商品圖。
 
