@@ -128,7 +128,7 @@ database_url = env(
 )
 
 DATABASES = {
-    'default': env.db_url(database_url)
+    'default': env.db_url_config(database_url)
 }
 
 
