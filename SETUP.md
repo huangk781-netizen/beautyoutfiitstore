@@ -179,19 +179,21 @@ python manage.py createsuperuser
 
 ## Email 與通知
 
-目前未設定 SMTP 時，Email 內容只會輸出到伺服器日誌。若要啟用實際寄信，於 Railway `web -> Variables` 加入：
+網站會在訂單成立與訂單設為「已出貨」時寄送 Email。正式環境未設定 SMTP 時，Email 內容只會輸出到伺服器日誌。
+
+若使用 Gmail，先在 Google 帳號開啟兩步驟驗證，建立專供此網站使用的「應用程式密碼」。再於 Railway `web -> Variables` 加入：
 
 ```env
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp.sendgrid.net
+EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
-EMAIL_HOST_USER=apikey
-EMAIL_HOST_PASSWORD=your-sendgrid-api-key
+EMAIL_HOST_USER=your-store-email@gmail.com
+EMAIL_HOST_PASSWORD=your-16-character-google-app-password
 EMAIL_USE_TLS=True
-DEFAULT_FROM_EMAIL=service@yourdomain.com
+DEFAULT_FROM_EMAIL=your-store-email@gmail.com
 ```
 
-SendGrid、Google 或其他 Email 服務的帳密與 API Key 都只能存放在 Railway Variables，不可寫入程式碼或 Git。
+`EMAIL_HOST_PASSWORD` 必須是 Google 應用程式密碼，不是 Gmail 的一般登入密碼。帳密與 API Key 都只能存放在 Railway Variables，不可寫入程式碼或 Git。
 
 ## 重要網址
 

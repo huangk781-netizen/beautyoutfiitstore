@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 
 from django.contrib import messages
@@ -16,6 +17,7 @@ from .views import _resolve_coupon, _resolve_points, _resolve_promotions
 
 
 STORE_PICKUP_SHIPPING_FEE = Decimal('60')
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -120,6 +122,10 @@ def checkout(request):
                     Member.objects.filter(pk=member.pk).update(points=F('points') - points_to_use)
 
                 cart.clear()
+            try:
+                order.send_confirmation_email()
+            except Exception:
+                logger.exception('Unable to send order confirmation email for order %s', order.pk)
             return redirect('orders:checkout_done', order_id=order.id)
 
     return render(request, 'orders/checkout.html', {

@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 
 from django.conf import settings
@@ -5,6 +6,9 @@ from django.db import models
 from django.db.models import F, Sum
 
 from products.models import ProductVariant
+
+
+logger = logging.getLogger(__name__)
 
 
 class Order(models.Model):
@@ -125,6 +129,45 @@ class Order(models.Model):
             from_email=None,
             recipient_list=[member.email],
             fail_silently=True,
+        )
+
+    def send_confirmation_email(self):
+        """Send the customer a receipt after a checkout is created."""
+        from django.core.mail import send_mail
+
+        member = self.member
+        if not member.email:
+            return
+
+        items = '\n'.join(
+            f'- {item.product_variant.product.name} '
+            f'({item.product_variant.get_size_display()} / {item.product_variant.color}) '
+            f'x {item.quantity}'
+            for item in self.items.select_related('product_variant__product')
+        )
+        payment_note = (
+            '請依訂單成立頁的匯款資訊完成付款。'
+            if self.payment_method == self.PaymentMethod.BANK_TRANSFER
+            else '貨到付款將於超商取貨時收取。'
+        )
+        message = (
+            f'{member.username} 您好，\n\n'
+            f'您的訂單 #{self.pk} 已成立。\n\n'
+            f'訂購商品：\n{items}\n\n'
+            f'取貨人：{self.recipient_name}（{self.recipient_phone}）\n'
+            f'取貨門市：{self.store_name}\n'
+            f'付款方式：{self.get_payment_method_display()}\n'
+            f'商品小計：NT$ {self.subtotal_amount:.0f}\n'
+            f'店到店運費：NT$ {self.shipping_fee:.0f}\n'
+            f'應付總額：NT$ {self.total_amount:.0f}\n\n'
+            f'{payment_note}\n\n'
+            '感謝您在 dudu_outfits_store 購物！'
+        )
+        send_mail(
+            subject=f'【dudu_outfits_store】訂單 #{self.pk} 已成立',
+            message=message,
+            from_email=None,
+            recipient_list=[member.email],
         )
 
     def _apply_loyalty_rewards(self):
