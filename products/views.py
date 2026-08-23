@@ -21,6 +21,7 @@ def product_list(request):
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk, is_active=True)
     variants = list(product.variants.all())
+    gallery_images = list(product.gallery_images.all())
 
     size_order = [code for code, _ in ProductVariant.Size.choices]
     size_display_map = dict(ProductVariant.Size.choices)
@@ -32,6 +33,7 @@ def product_detail(request, pk):
 
     context = {
         'product': product,
+        'gallery_images': gallery_images,
         'sizes': [{'code': code, 'display': size_display_map[code]} for code in sizes],
         'colors': colors,
         'variants_data': [

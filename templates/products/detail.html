@@ -7,11 +7,30 @@
 <a href="{% url 'products:product_list' %}" class="text-sm text-accent hover:underline">&larr; 返回商品列表</a>
 
 <div class="mt-6 grid md:grid-cols-2 gap-8 md:gap-12">
-  <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-secondary/50 flex items-center justify-center">
-    {% if product.image %}
-    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
-    {% else %}
-    <span class="text-accent text-sm">尚無圖片</span>
+  <div>
+    <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-secondary/50 flex items-center justify-center">
+      {% if product.image %}
+      <img id="product-main-image" src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+      {% elif gallery_images %}
+      <img id="product-main-image" src="{{ gallery_images.0.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+      {% else %}
+      <span class="text-accent text-sm">尚無圖片</span>
+      {% endif %}
+    </div>
+
+    {% if product.image or gallery_images %}
+    <div class="mt-3 grid grid-cols-5 gap-2" aria-label="商品圖片">
+      {% if product.image %}
+      <button type="button" data-gallery-image="{{ product.image.url }}" aria-label="檢視商品圖片 1" aria-pressed="true" class="gallery-thumbnail aspect-[3/4] overflow-hidden rounded-lg border-2 border-accent">
+        <img src="{{ product.image.url }}" alt="" class="w-full h-full object-cover">
+      </button>
+      {% endif %}
+      {% for gallery_image in gallery_images %}
+      <button type="button" data-gallery-image="{{ gallery_image.image.url }}" aria-label="檢視商品圖片 {% if product.image %}{{ forloop.counter|add:1 }}{% else %}{{ forloop.counter }}{% endif %}" aria-pressed="{% if not product.image and forloop.first %}true{% else %}false{% endif %}" class="gallery-thumbnail aspect-[3/4] overflow-hidden rounded-lg border-2 {% if not product.image and forloop.first %}border-accent{% else %}border-transparent{% endif %}">
+        <img src="{{ gallery_image.image.url }}" alt="" class="w-full h-full object-cover">
+      </button>
+      {% endfor %}
+    </div>
     {% endif %}
   </div>
 
@@ -108,5 +127,6 @@
   </div>
 </div>
 
+<script src="{% static 'js/product-gallery.js' %}?v=1"></script>
 <script src="{% static 'js/product-detail.js' %}?v=4"></script>
 {% endblock %}

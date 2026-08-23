@@ -51,6 +51,24 @@ class Product(models.Model):
         return self.name
 
 
+class ProductImage(models.Model):
+    """Additional gallery images for a product."""
+
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='gallery_images', verbose_name='商品'
+    )
+    image = models.ImageField(upload_to='products/', verbose_name='商品圖片')
+    sort_order = models.PositiveSmallIntegerField(default=0, verbose_name='顯示順序')
+
+    class Meta:
+        verbose_name = '商品圖片'
+        verbose_name_plural = '商品圖片'
+        ordering = ['sort_order', 'id']
+
+    def __str__(self):
+        return f'{self.product.name} 圖片 {self.pk}'
+
+
 class ProductVariant(models.Model):
     """商品規格：尺寸、顏色、庫存"""
 
