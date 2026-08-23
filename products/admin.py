@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django import forms
 from django.forms.models import BaseInlineFormSet
+from django.db.models import Max
 
 from .models import Category, Product, ProductImage, ProductVariant
 
@@ -8,6 +10,41 @@ from .models import Category, Product, ProductImage, ProductVariant
 class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
+
+
+class MultipleImageInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleImageField(forms.ImageField):
+    widget = MultipleImageInput
+
+    def clean(self, data, initial=None):
+        if not data:
+            return []
+        files = data if isinstance(data, (list, tuple)) else [data]
+        return [super(MultipleImageField, self).clean(image, initial) for image in files]
+
+
+class ProductAdminForm(forms.ModelForm):
+    gallery_uploads = MultipleImageField(
+        required=False,
+        label='一次新增附加圖片',
+        help_text='可一次選取多張不同圖片。主圖與附加圖片合計最多 10 張。',
+        widget=MultipleImageInput(attrs={'accept': 'image/*'}),
+    )
+
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+    def clean_gallery_uploads(self):
+        uploads = self.cleaned_data['gallery_uploads']
+        primary_image_count = 1 if self.cleaned_data.get('image') or self.instance.image else 0
+        existing_gallery_count = self.instance.gallery_images.count() if self.instance.pk else 0
+        if primary_image_count + existing_gallery_count + len(uploads) > 10:
+            raise ValidationError('主圖與附加圖片合計最多只能有 10 張。')
+        return uploads
 
 
 class ProductImageInlineFormSet(BaseInlineFormSet):
@@ -31,7 +68,7 @@ class ProductImageInlineFormSet(BaseInlineFormSet):
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     formset = ProductImageInlineFormSet
-    extra = 1
+    extra = 0
     max_num = 10
     fields = ('image', 'sort_order')
     verbose_name = '附加商品圖片'
@@ -46,11 +83,28 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    form = ProductAdminForm
     list_display = ('name', 'category', 'price', 'is_active', 'created_at')
     list_filter = ('category', 'is_active')
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductImageInline, ProductVariantInline]
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        uploads = form.cleaned_data.get('gallery_uploads', [])
+        if not uploads:
+            return
+
+        latest_sort_order = (
+            form.instance.gallery_images.aggregate(latest=Max('sort_order'))['latest'] or 0
+        )
+        for offset, image in enumerate(uploads, start=1):
+            ProductImage.objects.create(
+                product=form.instance,
+                image=image,
+                sort_order=latest_sort_order + offset,
+            )
 
 
 @admin.register(ProductVariant)
