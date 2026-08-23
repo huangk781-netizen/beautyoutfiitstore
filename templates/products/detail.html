@@ -43,6 +43,21 @@
     <p class="mt-6 text-neutral/80 leading-relaxed whitespace-pre-line">{{ product.description }}</p>
     {% endif %}
 
+    {% if size_guide_rows %}
+    <div class="mt-6 border-t border-secondary pt-5">
+      <p class="text-sm font-medium text-neutral mb-3">尺寸對照</p>
+      <div class="space-y-2 text-sm text-neutral">
+        {% for row in size_guide_rows %}
+        <div class="flex items-baseline gap-3">
+          <span class="w-10 shrink-0 font-medium text-accent">{{ row.size }}</span>
+          <span>{{ row.label }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <p class="mt-3 text-xs text-neutral/70">建議依平常穿著的下胸圍選擇；介於兩個尺寸時，偏好貼身選小一碼，偏好舒適選大一碼。</p>
+    </div>
+    {% endif %}
+
     {{ variants_data|json_script:"variants-data" }}
 
     <div class="mt-8 space-y-6" id="variant-selector">

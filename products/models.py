@@ -31,6 +31,11 @@ class Product(models.Model):
     name = models.CharField(max_length=200, verbose_name='商品名稱')
     slug = models.SlugField(max_length=220, unique=True, blank=True, verbose_name='網址代稱')
     description = models.TextField(blank=True, verbose_name='商品描述')
+    size_guide = models.TextField(
+        blank=True,
+        verbose_name='尺寸對照',
+        help_text='每行輸入「尺寸代碼|對照文案」，例如 XS|32 / 70 A-B 杯。',
+    )
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='商品圖片')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='售價')
     is_active = models.BooleanField(default=True, verbose_name='是否上架')
