@@ -40,7 +40,7 @@ class OrderAdmin(admin.ModelAdmin):
     form = OrderAdminForm
     list_display = (
         'id', 'member', 'payment_method', 'shipping_method', 'colored_status',
-        'tracking_number', 'coupon', 'points_used', 'points_earned', 'total_amount', 'created_at',
+        'tracking_number', 'coupon', 'points_used', 'points_earned', 'shipping_fee', 'total_amount', 'created_at',
     )
     list_filter = ('status', 'payment_method', 'shipping_method')
     search_fields = ('recipient_name', 'recipient_phone', 'member__username', 'tracking_number')

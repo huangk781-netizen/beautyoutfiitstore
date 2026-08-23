@@ -73,6 +73,7 @@ class Order(models.Model):
     points_earned = models.PositiveIntegerField(default=0, verbose_name='本單獲得點數')
 
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='訂單總金額')
+    shipping_fee = models.DecimalField(max_digits=10, decimal_places=2, default=60, verbose_name='店到店運費')
     tracking_number = models.CharField(max_length=100, blank=True, verbose_name='託運單號')
     return_reason = models.TextField(blank=True, verbose_name='退貨原因')
 
@@ -114,7 +115,8 @@ class Order(models.Model):
             f'託運單號：{self.tracking_number or "（尚未提供）"}\n'
             f'物流方式：{self.get_shipping_method_display()}\n'
             f'收件人：{self.recipient_name}（{self.recipient_phone}）\n'
-            f'收件地址：{self.shipping_address}\n\n'
+            f'取貨門市：{self.store_name}\n'
+            f'店到店運費：NT$ {self.shipping_fee:.0f}\n\n'
             f'感謝您在 dudu_outfits_store 購物！'
         )
         send_mail(
