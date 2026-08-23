@@ -37,6 +37,11 @@ DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 
+# 收款資訊僅放在環境變數，避免帳號出現在原始碼與 Git 歷史中。
+BANK_TRANSFER_BANK_NAME = env('BANK_TRANSFER_BANK_NAME', default='')
+BANK_TRANSFER_BANK_CODE = env('BANK_TRANSFER_BANK_CODE', default='')
+BANK_TRANSFER_ACCOUNT_NUMBER = env('BANK_TRANSFER_ACCOUNT_NUMBER', default='')
+
 
 # Application definition
 

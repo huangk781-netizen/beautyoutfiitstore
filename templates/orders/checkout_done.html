@@ -16,11 +16,13 @@
   {% if order.payment_method == 'bank_transfer' %}
   <div class="mt-8 text-left bg-secondary/40 rounded-2xl p-6 space-y-2">
     <p class="text-sm font-medium text-neutral">請匯款至以下帳戶</p>
-    <p class="text-neutral">陽春銀行 (700)</p>
-    <p class="text-neutral tracking-wide">123-456-789012</p>
-    <p class="mt-4 text-sm text-accent leading-relaxed">
-      匯款後請聯繫客服並告知匯款帳號末五碼，我們確認後會盡快為您安排出貨。
-    </p>
+    {% if bank_transfer.account_number %}
+    <p class="text-neutral">{{ bank_transfer.bank_name }}{% if bank_transfer.bank_code %} ({{ bank_transfer.bank_code }}){% endif %}</p>
+    <p class="text-neutral tracking-wide">{{ bank_transfer.account_number }}</p>
+    <p class="mt-4 text-sm text-accent leading-relaxed">匯款後請聯繫客服並告知匯款帳號末五碼，我們確認後會盡快為您安排出貨。</p>
+    {% else %}
+    <p class="text-sm text-accent leading-relaxed">匯款資訊設定中，請聯繫客服確認後再付款。</p>
+    {% endif %}
   </div>
   {% else %}
   <div class="mt-8 bg-secondary/40 rounded-2xl p-6">

@@ -1,6 +1,7 @@
 from datetime import timedelta
 from decimal import Decimal
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
@@ -204,7 +205,14 @@ def checkout(request):
 @login_required
 def checkout_done(request, order_id):
     order = get_object_or_404(Order, pk=order_id, member=request.user)
-    return render(request, 'orders/checkout_done.html', {'order': order})
+    return render(request, 'orders/checkout_done.html', {
+        'order': order,
+        'bank_transfer': {
+            'bank_name': settings.BANK_TRANSFER_BANK_NAME,
+            'bank_code': settings.BANK_TRANSFER_BANK_CODE,
+            'account_number': settings.BANK_TRANSFER_ACCOUNT_NUMBER,
+        },
+    })
 
 
 @login_required

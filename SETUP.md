@@ -119,8 +119,13 @@ gunicorn config.wsgi:application
 | `MYSQL_URL` | Railway MySQL 提供的參照變數 | Django 連 MySQL；不要手動公開此值 |
 | `ALLOWED_HOSTS` | `web-production-fa3f02.up.railway.app` | 允許 Django 接受此網域 |
 | `CSRF_TRUSTED_ORIGINS` | `https://web-production-fa3f02.up.railway.app` | 讓登入、註冊與後台表單可安全送出 |
+| `BANK_TRANSFER_BANK_NAME` | `國泰世華銀行` | ATM/銀行匯款訂單完成頁顯示的銀行名稱 |
+| `BANK_TRANSFER_BANK_CODE` | `013` | ATM/銀行匯款訂單完成頁顯示的銀行代碼 |
+| `BANK_TRANSFER_ACCOUNT_NUMBER` | 你的收款帳號 | ATM/銀行匯款訂單完成頁顯示的收款帳號 |
 
 若使用自訂網域，將它也加到 `ALLOWED_HOSTS` 與 `CSRF_TRUSTED_ORIGINS`。多個值以逗號分隔。
+
+收款帳號只能設定在 Railway Variables，不要寫進 `.env` 範例、原始碼或 GitHub；網站只會在會員完成 ATM/銀行匯款訂單後顯示這些資料。
 
 ### 部署流程
 
