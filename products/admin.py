@@ -12,7 +12,7 @@ class ProductVariantInline(admin.TabularInline):
     extra = 1
 
 
-class MultipleImageInput(forms.ClearableFileInput):
+class MultipleImageInput(forms.FileInput):
     allow_multiple_selected = True
 
 
@@ -27,10 +27,10 @@ class MultipleImageField(forms.ImageField):
 
 
 class ProductAdminForm(forms.ModelForm):
-    gallery_uploads = MultipleImageField(
+    image = MultipleImageField(
         required=False,
-        label='一次新增附加圖片',
-        help_text='可一次選取多張不同圖片。主圖與附加圖片合計最多 10 張。',
+        label='商品圖片',
+        help_text='可一次選取多張不同圖片。第一張會設為主圖，全部合計最多 10 張。',
         widget=MultipleImageInput(attrs={'accept': 'image/*'}),
     )
 
@@ -38,13 +38,15 @@ class ProductAdminForm(forms.ModelForm):
         model = Product
         fields = '__all__'
 
-    def clean_gallery_uploads(self):
-        uploads = self.cleaned_data['gallery_uploads']
-        primary_image_count = 1 if self.cleaned_data.get('image') or self.instance.image else 0
+    def clean_image(self):
+        uploads = self.cleaned_data['image']
+        primary_image_count = 1 if uploads or self.instance.image else 0
         existing_gallery_count = self.instance.gallery_images.count() if self.instance.pk else 0
-        if primary_image_count + existing_gallery_count + len(uploads) > 10:
+        additional_image_count = max(len(uploads) - 1, 0)
+        if primary_image_count + existing_gallery_count + additional_image_count > 10:
             raise ValidationError('主圖與附加圖片合計最多只能有 10 張。')
-        return uploads
+        self.additional_images = uploads[1:]
+        return uploads[0] if uploads else self.instance.image
 
 
 class ProductImageInlineFormSet(BaseInlineFormSet):
@@ -92,7 +94,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
-        uploads = form.cleaned_data.get('gallery_uploads', [])
+        uploads = getattr(form, 'additional_images', [])
         if not uploads:
             return
 
