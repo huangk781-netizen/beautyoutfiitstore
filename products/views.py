@@ -34,9 +34,31 @@ def japan_landing(request):
         .select_related('category')
         .prefetch_related('variants')
     )
+    product_cards = []
+
+    for product in products:
+        jp_size_rows = _parse_size_guide(product.jp_size_guide or product.size_guide)
+        sizes = []
+        colors = []
+        for variant in product.variants.all():
+            if variant.size not in sizes:
+                sizes.append(variant.size)
+            color = variant.jp_color or variant.color
+            if color not in colors:
+                colors.append(color)
+
+        product_cards.append({
+            'product': product,
+            'name': product.jp_name or product.name,
+            'description': product.jp_description,
+            'category_name': product.category.jp_name or product.category.name,
+            'size_rows': jp_size_rows,
+            'sizes': sizes,
+            'colors': colors,
+        })
 
     context = {
-        'products': products,
+        'product_cards': product_cards,
     }
     return render(request, 'products/japan_landing.html', context)
 

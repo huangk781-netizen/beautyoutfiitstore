@@ -6,6 +6,7 @@ class Category(models.Model):
     """商品分類"""
 
     name = models.CharField(max_length=100, unique=True, verbose_name='分類名稱')
+    jp_name = models.CharField(max_length=100, blank=True, verbose_name='日文分類名稱')
     slug = models.SlugField(max_length=120, unique=True, blank=True, verbose_name='網址代稱')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -29,12 +30,19 @@ class Product(models.Model):
         Category, on_delete=models.PROTECT, related_name='products', verbose_name='分類'
     )
     name = models.CharField(max_length=200, verbose_name='商品名稱')
+    jp_name = models.CharField(max_length=200, blank=True, verbose_name='日文商品名稱')
     slug = models.SlugField(max_length=220, unique=True, blank=True, verbose_name='網址代稱')
     description = models.TextField(blank=True, verbose_name='商品描述')
+    jp_description = models.TextField(blank=True, verbose_name='日文商品描述')
     size_guide = models.TextField(
         blank=True,
         verbose_name='尺寸對照',
         help_text='每行輸入「尺寸代碼|對照文案」，例如 XS|32 / 70 A-B 杯。',
+    )
+    jp_size_guide = models.TextField(
+        blank=True,
+        verbose_name='日文尺寸對照',
+        help_text='每行輸入「尺寸代碼|日文對照文案」，例如 M|着丈 62cm / 身幅 48cm。',
     )
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='商品圖片')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='售價')
@@ -91,6 +99,7 @@ class ProductVariant(models.Model):
     )
     size = models.CharField(max_length=10, choices=Size.choices, verbose_name='尺寸')
     color = models.CharField(max_length=50, verbose_name='顏色')
+    jp_color = models.CharField(max_length=50, blank=True, verbose_name='日文顏色')
     sku = models.CharField(max_length=64, unique=True, verbose_name='貨號')
     stock = models.PositiveIntegerField(default=0, verbose_name='庫存數量')
 

@@ -10,6 +10,7 @@ from .models import Category, Product, ProductImage, ProductVariant
 class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
+    fields = ('size', 'color', 'jp_color', 'sku', 'stock')
 
 
 class MultipleImageInput(forms.FileInput):
@@ -79,16 +80,29 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'created_at')
+    list_display = ('name', 'jp_name', 'slug', 'created_at')
+    search_fields = ('name', 'jp_name')
     prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
-    list_display = ('name', 'category', 'price', 'is_active', 'created_at')
+    fieldsets = (
+        ('中文商品資訊', {
+            'fields': ('category', 'name', 'slug', 'description', 'size_guide'),
+        }),
+        ('日本頁商品資訊', {
+            'fields': ('jp_name', 'jp_description', 'jp_size_guide'),
+            'description': '這些欄位只會顯示在日本專用頁，不會影響中文網站。',
+        }),
+        ('商品設定', {
+            'fields': ('image', 'price', 'is_active'),
+        }),
+    )
+    list_display = ('name', 'jp_name', 'category', 'price', 'is_active', 'created_at')
     list_filter = ('category', 'is_active')
-    search_fields = ('name',)
+    search_fields = ('name', 'jp_name')
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductImageInline, ProductVariantInline]
 
@@ -111,6 +125,6 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductVariant)
 class ProductVariantAdmin(admin.ModelAdmin):
-    list_display = ('product', 'size', 'color', 'sku', 'stock')
+    list_display = ('product', 'size', 'color', 'jp_color', 'sku', 'stock')
     list_filter = ('size', 'color')
-    search_fields = ('sku', 'product__name')
+    search_fields = ('sku', 'product__name', 'product__jp_name', 'color', 'jp_color')
