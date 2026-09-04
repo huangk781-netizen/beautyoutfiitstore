@@ -6,6 +6,7 @@
 
 - 網站：https://web-production-fa3f02.up.railway.app/
 - 日本顧客專用頁：https://web-production-fa3f02.up.railway.app/jp/
+- 日本顧客註冊頁：https://web-production-fa3f02.up.railway.app/jp/register/
 - 管理後台：https://web-production-fa3f02.up.railway.app/admin/
 - 部署平台：Railway
 - 原始碼：GitHub `huangk781-netizen/beautyoutfiitstore` 的 `main` 分支
@@ -16,6 +17,7 @@ Railway 網址是平台產生的公開網址。網站顯示名稱已是 `dudu_ou
 
 - 商品分類、商品資訊、最多 10 張商品圖片、尺寸、顏色、SKU 與庫存管理
 - 日本顧客專用頁 `/jp/`，可顯示日文商品名稱、分類、顏色、描述與尺寸資訊
+- 日本顧客註冊頁 `/jp/register/` 與日文登入頁 `/jp/login/`，共用既有會員系統但不影響中文註冊流程
 - 會員註冊、帳密登入、登出、會員中心與訂單紀錄
 - 購物車數量調整、庫存檢查與結帳
 - ATM/銀行轉帳、貨到付款與超商取貨；結帳時固定加收店到店運費 NT$60
@@ -183,6 +185,7 @@ python manage.py createsuperuser
 - 日文商品描述建議用日本客人看得懂的自然文案，不要逐字翻譯中文。
 - 日文尺寸對照格式與中文相同，每行使用 `尺寸代碼|日文尺寸文案`，例如 `M|着丈 62cm / 身幅 42cm`。
 - 日本頁目前的購買按鈕是詢問導向，正式付款與配送方式確認前，不會讓日本客人直接進入中文結帳流程。
+- 日本顧客可從 `/jp/` 進入 `/jp/register/` 註冊。註冊成功後會自動登入並回到日本頁。
 
 訂單處理：
 
@@ -215,6 +218,8 @@ DEFAULT_FROM_EMAIL=your-store-email@gmail.com
 | --- | --- |
 | 首頁 | `/` |
 | 日本顧客專用頁 | `/jp/` |
+| 日本顧客註冊頁 | `/jp/register/` |
+| 日本顧客登入頁 | `/jp/login/` |
 | 商品列表 | `/products/` |
 | 購物車 | `/cart/` |
 | 結帳 | `/checkout/` |

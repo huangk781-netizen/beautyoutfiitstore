@@ -1,0 +1,95 @@
+{% load static %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン | dudu_outfits_store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <style>
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-base text-neutral antialiased">
+  <header class="border-b border-secondary bg-base/90">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+      <a href="{% url 'japan_landing' %}" class="text-sm font-medium tracking-wide text-neutral sm:text-base">
+        dudu_outfits_store
+      </a>
+      <a href="{% url 'japan_landing' %}" class="text-xs font-medium text-accent hover:underline">日本ページへ戻る</a>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-sm px-4 py-10 sm:py-14">
+    <p class="text-xs font-medium uppercase tracking-[0.25em] text-accent">For Japan Customers</p>
+    <h1 class="mt-3 text-2xl font-medium text-neutral">ログイン</h1>
+
+    <form method="post" class="mt-8 space-y-4">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <div class="rounded-xl bg-accent/20 px-4 py-3 text-sm text-accent">
+        {{ form.non_field_errors }}
+      </div>
+      {% endif %}
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-neutral">ユーザー名</label>
+        <input
+          type="text"
+          name="username"
+          value="{{ form.username.value|default:'' }}"
+          required
+          autofocus
+          autocomplete="username"
+          class="w-full rounded-xl border border-secondary bg-base px-4 py-3 text-neutral focus:border-accent focus:outline-none"
+        >
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-neutral">パスワード</label>
+        <input
+          type="password"
+          name="password"
+          required
+          autocomplete="current-password"
+          class="w-full rounded-xl border border-secondary bg-base px-4 py-3 text-neutral focus:border-accent focus:outline-none"
+        >
+      </div>
+
+      <input type="hidden" name="next" value="{{ next }}">
+
+      <button type="submit" class="mt-2 w-full rounded-2xl bg-accent px-8 py-3 text-base font-medium">
+        ログイン
+      </button>
+    </form>
+
+    {% get_providers as socialaccount_providers %}
+    {% for provider in socialaccount_providers %}
+    {% if provider.id == 'google' %}
+    <div class="relative mt-6">
+      <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-secondary"></div></div>
+      <div class="relative flex justify-center text-xs"><span class="bg-base px-3 text-accent">または</span></div>
+    </div>
+
+    <a
+      href="{% provider_login_url 'google' next=next %}"
+      class="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-secondary px-8 py-3 font-medium text-neutral transition-colors hover:border-accent"
+    >
+      Googleでログイン
+    </a>
+    {% endif %}
+    {% endfor %}
+
+    <p class="mt-6 text-center text-sm text-neutral">
+      アカウントをお持ちでない方は
+      <a href="{% url 'jp_register' %}?next={{ next }}" class="text-accent hover:underline">会員登録</a>
+    </p>
+  </main>
+</body>
+</html>

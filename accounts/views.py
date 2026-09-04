@@ -1,9 +1,13 @@
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.db.models import Sum
 from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils import translation
+from django.utils.http import url_has_allowed_host_and_scheme
 
-from .forms import RegisterForm
+from .forms import JapaneseRegisterForm, RegisterForm
 from .models import LoyaltySettings, Member
 
 
@@ -27,6 +31,59 @@ def register(request):
         form = RegisterForm()
 
     return render(request, 'accounts/register.html', {'form': form, 'next': next_url})
+
+
+def jp_register(request):
+    if request.user.is_authenticated:
+        return redirect('japan_landing')
+
+    next_url = request.POST.get('next') or request.GET.get('next') or reverse('japan_landing')
+    if not url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        next_url = reverse('japan_landing')
+
+    with translation.override('ja'):
+        if request.method == 'POST':
+            form = JapaneseRegisterForm(request.POST)
+            if form.is_valid():
+                user = form.save()
+                auth_login(
+                    request,
+                    user,
+                    backend='django.contrib.auth.backends.ModelBackend',
+                )
+                return redirect(next_url)
+        else:
+            form = JapaneseRegisterForm()
+
+    return render(request, 'accounts/jp_register.html', {'form': form, 'next': next_url})
+
+
+def jp_login(request):
+    if request.user.is_authenticated:
+        return redirect('japan_landing')
+
+    next_url = request.POST.get('next') or request.GET.get('next') or reverse('japan_landing')
+    if not url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        next_url = reverse('japan_landing')
+
+    with translation.override('ja'):
+        if request.method == 'POST':
+            form = AuthenticationForm(request, data=request.POST)
+            if form.is_valid():
+                auth_login(request, form.get_user())
+                return redirect(next_url)
+        else:
+            form = AuthenticationForm(request)
+
+    return render(request, 'accounts/jp_login.html', {'form': form, 'next': next_url})
 
 
 @login_required
