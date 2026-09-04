@@ -27,6 +27,20 @@ def product_list(request):
     return render(request, 'products/list.html', context)
 
 
+def japan_landing(request):
+    products = (
+        Product.objects
+        .filter(is_active=True)
+        .select_related('category')
+        .prefetch_related('variants')
+    )
+
+    context = {
+        'products': products,
+    }
+    return render(request, 'products/japan_landing.html', context)
+
+
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk, is_active=True)
     variants = list(product.variants.all())
