@@ -26,11 +26,6 @@
         <a href="#items" class="hover:text-accent">Items</a>
         <a href="#guide" class="hover:text-accent">Guide</a>
         <a href="#contact" class="hover:text-accent">Contact</a>
-        {% if user.is_authenticated %}
-        <a href="{% url 'accounts:profile' %}" class="text-accent hover:underline">My Page</a>
-        {% else %}
-        <a href="{% url 'jp_register' %}" class="text-accent hover:underline">会員登録</a>
-        {% endif %}
       </nav>
     </div>
   </header>
@@ -50,11 +45,6 @@
             <a href="#items" class="inline-flex items-center justify-center rounded-2xl bg-accent px-6 py-3 text-sm font-medium text-base transition-opacity hover:opacity-90">
               アイテムを見る
             </a>
-            {% if not user.is_authenticated %}
-            <a href="{% url 'jp_register' %}" class="inline-flex items-center justify-center rounded-2xl border border-accent px-6 py-3 text-sm font-medium text-accent transition-opacity hover:opacity-90">
-              会員登録
-            </a>
-            {% endif %}
             <a href="#contact" class="inline-flex items-center justify-center rounded-2xl border border-secondary px-6 py-3 text-sm font-medium text-neutral transition-colors hover:border-accent">
               お問い合わせ
             </a>
@@ -190,11 +180,6 @@
           <p class="font-medium text-neutral">送信内容の例</p>
           <p class="mt-2">「日本から購入希望です。商品名：〇〇、カラー：〇〇、サイズ：〇〇。在庫と送料を教えてください。」</p>
         </div>
-        {% if not user.is_authenticated %}
-        <a href="{% url 'jp_register' %}" class="mt-6 inline-flex items-center justify-center rounded-2xl bg-accent px-6 py-3 text-sm font-medium text-base transition-opacity hover:opacity-90">
-          会員登録する
-        </a>
-        {% endif %}
       </div>
     </section>
   </main>
