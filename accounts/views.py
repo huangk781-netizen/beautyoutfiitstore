@@ -59,7 +59,7 @@ def jp_register(request):
         else:
             form = JapaneseRegisterForm()
 
-    return render(request, 'accounts/jp_register.html', {'form': form, 'next': next_url})
+        return render(request, 'accounts/jp_register.html', {'form': form, 'next': next_url})
 
 
 def jp_login(request):
@@ -83,7 +83,7 @@ def jp_login(request):
         else:
             form = AuthenticationForm(request)
 
-    return render(request, 'accounts/jp_login.html', {'form': form, 'next': next_url})
+        return render(request, 'accounts/jp_login.html', {'form': form, 'next': next_url})
 
 
 @login_required
