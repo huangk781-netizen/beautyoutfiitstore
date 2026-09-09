@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>日本のお客様へ | dudu_outfits_store</title>
-  <meta name="description" content="dudu_outfits_storeの日本向けご案内ページ。日本配送は現在準備中です。気になる商品はお問い合わせください。">
+  <meta name="description" content="dudu_outfits_storeの日本向け商品ページ。販売中の商品はQoo10からご購入いただけます。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -44,7 +44,7 @@
             日本のお客様へ
           </h1>
           <p class="mt-5 max-w-xl text-base leading-8 text-neutral/80 sm:text-lg">
-            dudu_outfits_storeは、日本のお客様に向けたご案内ページを準備しました。現在は日本への配送方法・お支払い方法を確認中のため、気になる商品がある場合はお問い合わせください。
+            dudu_outfits_storeの日本向け商品ページです。Qoo10への掲載が完了した商品から、各商品ページのボタンよりご購入いただけます。
           </p>
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
             <a href="#items" class="inline-flex items-center justify-center rounded-2xl bg-accent px-6 py-3 text-sm font-medium text-base transition-opacity hover:opacity-90">
@@ -127,6 +127,15 @@
             </div>
             {% endif %}
             <div class="mt-3 flex flex-col gap-2">
+              {% if card.product.qoo10_url %}
+              <a href="{{ card.product.qoo10_url }}" target="_blank" rel="noopener noreferrer sponsored" class="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2 text-xs font-medium text-base transition-opacity hover:opacity-90">
+                Qoo10で購入
+              </a>
+              {% else %}
+              <span class="inline-flex cursor-not-allowed items-center justify-center rounded-xl border border-secondary bg-secondary/35 px-4 py-2 text-xs font-medium text-neutral/70" aria-disabled="true">
+                Qoo10販売準備中
+              </span>
+              {% endif %}
               <a href="#contact" class="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2 text-xs font-medium text-base transition-opacity hover:opacity-90">
                 問い合わせる
               </a>
@@ -151,13 +160,13 @@
           <div class="rounded-2xl border border-secondary bg-base/70 p-5">
             <h3 class="text-sm font-medium text-neutral">配送について</h3>
             <p class="mt-2 text-sm leading-7 text-neutral/75">
-              日本への配送方法・送料は現在確認中です。商品やお届け先により異なる場合があるため、ご希望の商品を確認後、個別にご案内いたします。
+              Qoo10に掲載中の商品は、商品ページに表示される配送方法・送料をご確認ください。掲載準備中の商品については個別にご案内いたします。
             </p>
           </div>
           <div class="rounded-2xl border border-secondary bg-base/70 p-5">
             <h3 class="text-sm font-medium text-neutral">お支払いについて</h3>
             <p class="mt-2 text-sm leading-7 text-neutral/75">
-              お支払い方法は現在準備中です。ご注文希望のお客様には、利用可能な方法を個別にご案内いたします。
+              Qoo10に掲載中の商品は、Qoo10の商品ページでご案内している決済方法をご利用いただけます。
             </p>
           </div>
           <div class="rounded-2xl border border-secondary bg-base/70 p-5">
@@ -175,7 +184,7 @@
         <p class="text-xs font-medium uppercase tracking-[0.25em] text-accent">Contact</p>
         <h2 class="mt-3 text-2xl font-medium text-neutral">お問い合わせ</h2>
         <p class="mt-4 text-sm leading-7 text-neutral/75">
-          気になる商品がある場合は、商品名・カラー・サイズを添えてInstagram DMまたはLINEよりお問い合わせください。日本向けの正式な配送・決済方法が決まり次第、このページでもご案内します。
+          Qoo10販売準備中の商品や、サイズ・在庫について確認したい場合は、商品名・カラー・サイズを添えてInstagram DMまたはLINEよりお問い合わせください。
         </p>
         <div class="mt-6 rounded-2xl border border-secondary bg-secondary/35 p-5 text-sm leading-7 text-neutral/80">
           <p class="font-medium text-neutral">送信内容の例</p>

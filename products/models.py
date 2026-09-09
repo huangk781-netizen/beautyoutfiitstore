@@ -44,6 +44,12 @@ class Product(models.Model):
         verbose_name='日文尺寸對照',
         help_text='每行輸入「尺寸代碼|日文對照文案」，例如 M|着丈 62cm / 身幅 48cm。',
     )
+    qoo10_url = models.URLField(
+        blank=True,
+        max_length=500,
+        verbose_name='Qoo10 商品連結',
+        help_text='完成 Qoo10 商品上架後，貼上該商品的完整網址；只會顯示在日本頁。',
+    )
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='商品圖片')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='售價')
     is_active = models.BooleanField(default=True, verbose_name='是否上架')

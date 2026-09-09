@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # 讀取 .env（本機開發用，正式環境改由 PaaS 平台的環境變數頁面設定，不需要這個檔案）
 env = environ.Env(
     DEBUG=(bool, True),
+    ENABLE_BANK_TRANSFER=(bool, False),
 )
 environ.Env.read_env(BASE_DIR / '.env')
 
@@ -41,6 +42,7 @@ CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 BANK_TRANSFER_BANK_NAME = env('BANK_TRANSFER_BANK_NAME', default='')
 BANK_TRANSFER_BANK_CODE = env('BANK_TRANSFER_BANK_CODE', default='')
 BANK_TRANSFER_ACCOUNT_NUMBER = env('BANK_TRANSFER_ACCOUNT_NUMBER', default='')
+ENABLE_BANK_TRANSFER = env('ENABLE_BANK_TRANSFER')
 
 
 # Application definition

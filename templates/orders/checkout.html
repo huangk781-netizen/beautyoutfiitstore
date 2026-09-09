@@ -129,7 +129,7 @@
     <div class="grid grid-cols-2 gap-3">
       {% for value, label in payment_methods %}
       <label class="cursor-pointer">
-        <input type="radio" name="payment_method" value="{{ value }}" class="peer sr-only" {% if form_data.payment_method == value %}checked{% endif %} required>
+        <input type="radio" name="payment_method" value="{{ value }}" class="peer sr-only" {% if selected_payment_method == value %}checked{% endif %} required>
         <span class="block px-4 py-3 rounded-xl border border-secondary text-center text-sm font-medium text-neutral peer-checked:bg-accent peer-checked:text-base peer-checked:border-accent transition-colors">{{ label }}</span>
       </label>
       {% endfor %}

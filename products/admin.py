@@ -93,18 +93,22 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('category', 'name', 'slug', 'description', 'size_guide'),
         }),
         ('日本頁商品資訊', {
-            'fields': ('jp_name', 'jp_description', 'jp_size_guide'),
-            'description': '這些欄位只會顯示在日本專用頁，不會影響中文網站。',
+            'fields': ('jp_name', 'jp_description', 'jp_size_guide', 'qoo10_url'),
+            'description': '這些欄位只會顯示在日本專用頁。Qoo10 網址留空時，頁面會顯示販售準備中。',
         }),
         ('商品設定', {
             'fields': ('image', 'price', 'is_active'),
         }),
     )
-    list_display = ('name', 'jp_name', 'category', 'price', 'is_active', 'created_at')
+    list_display = ('name', 'jp_name', 'category', 'price', 'has_qoo10_link', 'is_active', 'created_at')
     list_filter = ('category', 'is_active')
     search_fields = ('name', 'jp_name')
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductImageInline, ProductVariantInline]
+
+    @admin.display(boolean=True, description='Qoo10 已上架')
+    def has_qoo10_link(self, obj):
+        return bool(obj.qoo10_url)
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)

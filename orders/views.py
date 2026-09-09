@@ -17,6 +17,7 @@ from marketing.models import Coupon, PromotionRule
 from products.models import ProductVariant
 
 from .models import Order, OrderItem
+from .payment import available_payment_methods, is_payment_method_available
 
 
 def _resolve_promotions(subtotal):
@@ -119,8 +120,8 @@ def checkout(request):
             errors.append('請輸入收件人電話')
         if not shipping_address:
             errors.append('請輸入收件地址')
-        if payment_method not in Order.PaymentMethod.values:
-            errors.append('請選擇付款方式')
+        if not is_payment_method_available(payment_method):
+            errors.append('目前僅開放貨到付款')
         if shipping_method not in Order.ShippingMethod.values:
             errors.append('請選擇物流方式')
         if shipping_method == Order.ShippingMethod.CONVENIENCE_STORE and not store_name:
@@ -183,7 +184,8 @@ def checkout(request):
         'cart': cart,
         'errors': errors,
         'form_data': form_data,
-        'payment_methods': Order.PaymentMethod.choices,
+        'payment_methods': available_payment_methods(),
+        'selected_payment_method': form_data.get('payment_method', Order.PaymentMethod.COD),
         'shipping_methods': Order.ShippingMethod.choices,
         'subtotal': subtotal,
         'promotion_rule': discount_rule,

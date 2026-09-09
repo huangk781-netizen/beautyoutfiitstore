@@ -13,6 +13,7 @@ from marketing.models import Coupon
 from products.models import ProductVariant
 
 from .models import Order, OrderItem
+from .payment import available_payment_methods, is_payment_method_available
 from .views import _resolve_coupon, _resolve_points, _resolve_promotions
 
 
@@ -67,8 +68,8 @@ def checkout(request):
             errors.append('請輸入取貨人手機號碼')
         if not store_name:
             errors.append('請輸入超商取貨門市')
-        if payment_method not in Order.PaymentMethod.values:
-            errors.append('請選擇付款方式')
+        if not is_payment_method_available(payment_method):
+            errors.append('目前僅開放貨到付款')
 
         for item in cart:
             if item['quantity'] > item['variant'].stock:
@@ -132,7 +133,8 @@ def checkout(request):
         'cart': cart,
         'errors': errors,
         'form_data': form_data,
-        'payment_methods': Order.PaymentMethod.choices,
+        'payment_methods': available_payment_methods(),
+        'selected_payment_method': form_data.get('payment_method', Order.PaymentMethod.COD),
         'subtotal': subtotal,
         'shipping_fee': STORE_PICKUP_SHIPPING_FEE,
         'promotion_rule': discount_rule,
