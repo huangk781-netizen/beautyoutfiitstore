@@ -1,12 +1,33 @@
 (function () {
   const mainImage = document.getElementById('product-main-image');
+  const mainVideo = document.getElementById('product-main-video');
   const thumbnails = Array.from(document.querySelectorAll('.gallery-thumbnail'));
 
-  if (!mainImage || thumbnails.length < 2) return;
+  if (thumbnails.length < 2) return;
 
   thumbnails.forEach((thumbnail) => {
     thumbnail.addEventListener('click', () => {
-      mainImage.src = thumbnail.dataset.galleryImage;
+      const isVideo = thumbnail.dataset.mediaType === 'video';
+
+      if (isVideo && mainVideo) {
+        if (mainImage) mainImage.classList.add('hidden');
+        mainVideo.src = thumbnail.dataset.mediaSrc;
+        if (thumbnail.dataset.mediaPoster) {
+          mainVideo.poster = thumbnail.dataset.mediaPoster;
+        } else {
+          mainVideo.removeAttribute('poster');
+        }
+        mainVideo.classList.remove('hidden');
+        mainVideo.load();
+      } else if (!isVideo && mainImage) {
+        if (mainVideo) {
+          mainVideo.pause();
+          mainVideo.classList.add('hidden');
+        }
+        mainImage.src = thumbnail.dataset.mediaSrc;
+        mainImage.classList.remove('hidden');
+      }
+
       thumbnails.forEach((item) => {
         const selected = item === thumbnail;
         item.setAttribute('aria-pressed', String(selected));

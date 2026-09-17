@@ -1,7 +1,9 @@
-from django.test import TestCase
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import Category, Product
+from .models import Category, Product, ProductVideo
 
 
 class JapanLandingQoo10Tests(TestCase):
@@ -34,3 +36,38 @@ class JapanLandingQoo10Tests(TestCase):
 
         self.assertContains(response, 'Qoo10販売準備中')
         self.assertNotContains(response, 'Qoo10で購入')
+
+
+@override_settings(STORAGES={
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+})
+class ProductVideoTests(TestCase):
+    def setUp(self):
+        category = Category.objects.create(name='洋裝')
+        self.product = Product.objects.create(
+            category=category,
+            name='影片測試商品',
+            price=1280,
+        )
+
+    def test_product_video_is_rendered_in_detail_gallery(self):
+        ProductVideo.objects.create(
+            product=self.product,
+            video='products/videos/look.mp4',
+        )
+
+        response = self.client.get(reverse('products:product_detail', args=[self.product.pk]))
+
+        self.assertContains(response, 'data-media-type="video"')
+        self.assertContains(response, 'look.mp4')
+        self.assertContains(response, 'controls')
+
+    def test_product_video_rejects_unsupported_extension(self):
+        video = ProductVideo(
+            product=self.product,
+            video=SimpleUploadedFile('look.avi', b'video-content', content_type='video/x-msvideo'),
+        )
+
+        with self.assertRaises(ValidationError):
+            video.full_clean()

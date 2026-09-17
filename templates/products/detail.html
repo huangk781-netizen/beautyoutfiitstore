@@ -13,21 +13,33 @@
       <img id="product-main-image" src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
       {% elif gallery_images %}
       <img id="product-main-image" src="{{ gallery_images.0.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
-      {% else %}
+      {% endif %}
+      {% if gallery_videos %}
+      <video id="product-main-video" src="{{ gallery_videos.0.video.url }}" {% if gallery_videos.0.poster %}poster="{{ gallery_videos.0.poster.url }}"{% endif %} controls playsinline preload="metadata" aria-label="{{ product.name }} 商品影片" class="{% if product.image or gallery_images %}hidden {% endif %}w-full h-full object-cover"></video>
+      {% endif %}
+      {% if not product.image and not gallery_images and not gallery_videos %}
       <span class="text-accent text-sm">尚無圖片</span>
       {% endif %}
     </div>
 
-    {% if product.image or gallery_images %}
-    <div class="mt-3 grid grid-cols-5 gap-2" aria-label="商品圖片">
+    {% if product.image or gallery_images or gallery_videos %}
+    <div class="mt-3 grid grid-cols-5 gap-2" aria-label="商品圖片與影片">
       {% if product.image %}
-      <button type="button" data-gallery-image="{{ product.image.url }}" aria-label="檢視商品圖片 1" aria-pressed="true" class="gallery-thumbnail aspect-[3/4] overflow-hidden rounded-lg border-2 border-accent">
+      <button type="button" data-media-type="image" data-media-src="{{ product.image.url }}" aria-label="檢視商品圖片 1" aria-pressed="true" class="gallery-thumbnail aspect-[3/4] overflow-hidden rounded-lg border-2 border-accent">
         <img src="{{ product.image.url }}" alt="" class="w-full h-full object-cover">
       </button>
       {% endif %}
       {% for gallery_image in gallery_images %}
-      <button type="button" data-gallery-image="{{ gallery_image.image.url }}" aria-label="檢視商品圖片 {% if product.image %}{{ forloop.counter|add:1 }}{% else %}{{ forloop.counter }}{% endif %}" aria-pressed="{% if not product.image and forloop.first %}true{% else %}false{% endif %}" class="gallery-thumbnail aspect-[3/4] overflow-hidden rounded-lg border-2 {% if not product.image and forloop.first %}border-accent{% else %}border-transparent{% endif %}">
+      <button type="button" data-media-type="image" data-media-src="{{ gallery_image.image.url }}" aria-label="檢視商品圖片 {% if product.image %}{{ forloop.counter|add:1 }}{% else %}{{ forloop.counter }}{% endif %}" aria-pressed="{% if not product.image and forloop.first %}true{% else %}false{% endif %}" class="gallery-thumbnail aspect-[3/4] overflow-hidden rounded-lg border-2 {% if not product.image and forloop.first %}border-accent{% else %}border-transparent{% endif %}">
         <img src="{{ gallery_image.image.url }}" alt="" class="w-full h-full object-cover">
+      </button>
+      {% endfor %}
+      {% for gallery_video in gallery_videos %}
+      <button type="button" data-media-type="video" data-media-src="{{ gallery_video.video.url }}" {% if gallery_video.poster %}data-media-poster="{{ gallery_video.poster.url }}"{% endif %} aria-label="播放商品影片 {{ forloop.counter }}" aria-pressed="{% if not product.image and not gallery_images and forloop.first %}true{% else %}false{% endif %}" class="gallery-thumbnail relative aspect-[3/4] overflow-hidden rounded-lg border-2 {% if not product.image and not gallery_images and forloop.first %}border-accent{% else %}border-transparent{% endif %}">
+        <video src="{{ gallery_video.video.url }}" {% if gallery_video.poster %}poster="{{ gallery_video.poster.url }}"{% endif %} muted playsinline preload="metadata" class="w-full h-full object-cover"></video>
+        <span class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+          <svg class="w-8 h-8 text-base" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="11" fill="#D67D9C"/><path d="M10 8.5v7l5-3.5-5-3.5Z" fill="white"/></svg>
+        </span>
       </button>
       {% endfor %}
     </div>
@@ -142,6 +154,6 @@
   </div>
 </div>
 
-<script src="{% static 'js/product-gallery.js' %}?v=1"></script>
+<script src="{% static 'js/product-gallery.js' %}?v=2"></script>
 <script src="{% static 'js/product-detail.js' %}?v=4"></script>
 {% endblock %}

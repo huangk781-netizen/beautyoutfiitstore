@@ -67,6 +67,7 @@ def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk, is_active=True)
     variants = list(product.variants.all())
     gallery_images = list(product.gallery_images.all())
+    gallery_videos = list(product.gallery_videos.all())
     size_guide_rows = _parse_size_guide(product.size_guide)
     size_guide_labels = {row['size']: row['label'] for row in size_guide_rows}
 
@@ -81,6 +82,7 @@ def product_detail(request, pk):
     context = {
         'product': product,
         'gallery_images': gallery_images,
+        'gallery_videos': gallery_videos,
         'sizes': [
             {
                 'code': code,

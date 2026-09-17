@@ -1,3 +1,4 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.text import slugify
 
@@ -86,6 +87,36 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f'{self.product.name} 圖片 {self.pk}'
+
+
+class ProductVideo(models.Model):
+    """Videos shown in a product's media gallery."""
+
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='gallery_videos', verbose_name='商品'
+    )
+    video = models.FileField(
+        upload_to='products/videos/',
+        verbose_name='商品影片',
+        validators=[FileExtensionValidator(allowed_extensions=['mp4', 'webm', 'ogg'])],
+        help_text='支援 MP4、WebM、OGG；建議使用 MP4（H.264）以獲得最佳相容性。',
+    )
+    poster = models.ImageField(
+        upload_to='products/video-posters/',
+        blank=True,
+        null=True,
+        verbose_name='影片封面',
+        help_text='選填；未上傳時縮圖會顯示影片的第一個可載入畫面。',
+    )
+    sort_order = models.PositiveSmallIntegerField(default=0, verbose_name='顯示順序')
+
+    class Meta:
+        verbose_name = '商品影片'
+        verbose_name_plural = '商品影片'
+        ordering = ['sort_order', 'id']
+
+    def __str__(self):
+        return f'{self.product.name} 影片 {self.pk}'
 
 
 class ProductVariant(models.Model):
