@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
 from accounts.views import jp_login, jp_register
-from products.views import japan_landing
+from products.views import japan_landing, japan_product_detail
 
 from .views import serve_media
 
@@ -14,6 +14,7 @@ urlpatterns = [
     path('media/<path:path>', serve_media, name='media'),
     path('admin/', admin.site.urls),
     path('jp/', japan_landing, name='japan_landing'),
+    path('jp/products/<int:pk>/', japan_product_detail, name='japan_product_detail'),
     path('jp/register/', jp_register, name='jp_register'),
     path('jp/login/', jp_login, name='jp_login'),
     path('', RedirectView.as_view(pattern_name='products:product_list'), name='home'),

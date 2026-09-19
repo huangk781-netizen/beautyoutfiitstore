@@ -53,7 +53,7 @@
 
         <div class="grid grid-cols-2 gap-3">
           {% for card in product_cards|slice:":4" %}
-          <a href="#item-{{ card.product.pk }}" class="group block overflow-hidden rounded-2xl bg-secondary/45">
+          <a href="{% url 'japan_product_detail' card.product.pk %}" class="group block overflow-hidden rounded-2xl bg-secondary/45" aria-label="{{ card.name }}の詳細を見る">
             <div class="aspect-[3/4]">
               {% if card.product.image %}
               <img src="{{ card.product.image.url }}" alt="{{ card.name }}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
@@ -85,7 +85,7 @@
       <div class="mt-8 grid grid-cols-2 gap-5 sm:gap-7 md:grid-cols-3 lg:grid-cols-4">
         {% for card in product_cards %}
         <article id="item-{{ card.product.pk }}" class="group scroll-mt-24">
-          <div class="overflow-hidden rounded-2xl bg-secondary/45">
+          <a href="{% url 'japan_product_detail' card.product.pk %}" aria-label="{{ card.name }}の詳細を見る" class="block overflow-hidden rounded-2xl bg-secondary/45">
             <div class="aspect-[3/4]">
               {% if card.product.image %}
               <img src="{{ card.product.image.url }}" alt="{{ card.name }}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
@@ -93,10 +93,10 @@
               <div class="flex h-full w-full items-center justify-center text-xs text-accent">No image</div>
               {% endif %}
             </div>
-          </div>
+          </a>
           <div class="mt-3">
             <p class="text-xs text-accent">{{ card.category_name }}</p>
-            <h3 class="mt-1 text-sm font-medium leading-6 text-neutral">{{ card.name }}</h3>
+            <h3 class="mt-1 text-sm font-medium leading-6 text-neutral"><a href="{% url 'japan_product_detail' card.product.pk %}" class="hover:text-accent">{{ card.name }}</a></h3>
             <p class="mt-1 text-sm text-accent">¥{{ card.jpy_price }}</p>
             {% if card.description %}
             <p class="mt-2 text-xs leading-5 text-neutral/75">{{ card.description|linebreaksbr }}</p>
@@ -117,6 +117,9 @@
             </div>
             {% endif %}
             <div class="mt-3 flex flex-col gap-2">
+              <a href="{% url 'japan_product_detail' card.product.pk %}" class="inline-flex items-center justify-center rounded-xl border border-secondary px-4 py-2 text-xs font-medium text-neutral transition-colors hover:border-accent">
+                商品の詳細を見る
+              </a>
               {% if card.product.qoo10_url %}
               <a href="{{ card.product.qoo10_url }}" target="_blank" rel="noopener noreferrer sponsored" class="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2 text-xs font-medium text-base transition-opacity hover:opacity-90">
                 Qoo10で購入

@@ -71,6 +71,29 @@ def japan_landing(request):
     return render(request, 'products/japan_landing.html', context)
 
 
+def japan_product_detail(request, pk):
+    product = get_object_or_404(
+        Product.objects.select_related('category').prefetch_related(
+            'variants', 'gallery_images', 'gallery_videos'
+        ),
+        pk=pk,
+        is_active=True,
+    )
+    variants = list(product.variants.all())
+    context = {
+        'product': product,
+        'name': product.jp_name or product.name,
+        'category_name': product.category.jp_name or product.category.name,
+        'jpy_price': _jpy_price_from_twd(product.price),
+        'size_rows': _parse_size_guide(product.jp_size_guide or product.size_guide),
+        'sizes': list(dict.fromkeys(variant.size for variant in variants)),
+        'colors': list(dict.fromkeys(variant.jp_color or variant.color for variant in variants)),
+        'gallery_images': list(product.gallery_images.all()),
+        'gallery_videos': list(product.gallery_videos.all()),
+    }
+    return render(request, 'products/japan_detail.html', context)
+
+
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk, is_active=True)
     variants = list(product.variants.all())

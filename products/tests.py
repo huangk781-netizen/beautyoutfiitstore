@@ -5,10 +5,14 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import Category, Product, ProductVideo
+from .models import Category, Product, ProductImage, ProductVariant, ProductVideo
 from .views import _jpy_price_from_twd
 
 
+@override_settings(STORAGES={
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+})
 class JapanLandingQoo10Tests(TestCase):
     def setUp(self):
         self.category = Category.objects.create(name='上衣', jp_name='トップス')
@@ -37,6 +41,52 @@ class JapanLandingQoo10Tests(TestCase):
 
         self.assertContains(response, '¥2390')
         self.assertNotContains(response, 'NT$ 500')
+
+    def test_japan_product_detail_shows_localized_information(self):
+        product = self.create_product(
+            jp_name='日本向けトップス',
+            jp_description='やわらかい素材です。',
+            jp_size_guide='M|着丈 50cm',
+            size_guide='M|Chinese size guide',
+            qoo10_url='https://www.qoo10.jp/g/123456789',
+        )
+        ProductVariant.objects.create(
+            product=product, size='M', color='Blue', jp_color='ブルー',
+            sku='JP-DETAIL-M-BLUE', stock=3,
+        )
+        ProductImage.objects.create(product=product, image='products/detail.jpg')
+        ProductVideo.objects.create(product=product, video='products/videos/detail.mp4')
+        detail_url = reverse('japan_product_detail', args=[product.pk])
+
+        listing = self.client.get(reverse('japan_landing'))
+        detail = self.client.get(detail_url)
+
+        self.assertContains(listing, detail_url)
+        self.assertContains(detail, '日本向けトップス')
+        self.assertContains(detail, 'やわらかい素材です。')
+        self.assertContains(detail, '着丈 50cm')
+        self.assertContains(detail, 'ブルー')
+        self.assertContains(detail, '¥2390')
+        self.assertContains(detail, 'detail.jpg')
+        self.assertContains(detail, 'detail.mp4')
+        self.assertContains(detail, 'https://www.qoo10.jp/g/123456789')
+        self.assertNotContains(detail, 'Chinese size guide')
+        self.assertNotContains(detail, 'NT$')
+
+    def test_inactive_product_has_no_japan_detail_page(self):
+        product = self.create_product(is_active=False)
+
+        response = self.client.get(reverse('japan_product_detail', args=[product.pk]))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_japan_detail_without_qoo10_url_shows_preparing_state(self):
+        product = self.create_product()
+
+        response = self.client.get(reverse('japan_product_detail', args=[product.pk]))
+
+        self.assertContains(response, 'Qoo10販売準備中')
+        self.assertNotContains(response, 'Qoo10で購入')
 
     def test_product_with_qoo10_url_links_to_listing(self):
         qoo10_url = 'https://www.qoo10.jp/g/123456789'
