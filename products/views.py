@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.shortcuts import get_object_or_404, render
 
 from .models import Category, Product, ProductVariant
@@ -10,6 +12,11 @@ def _parse_size_guide(size_guide):
         if separator and size.strip() and label.strip():
             rows.append({'size': size.strip(), 'label': label.strip()})
     return rows
+
+
+def _jpy_price_from_twd(twd_price):
+    converted = Decimal(twd_price) / Decimal('0.21')
+    return int(converted // 100) * 100 + 90
 
 
 def product_list(request):
@@ -49,6 +56,7 @@ def japan_landing(request):
 
         product_cards.append({
             'product': product,
+            'jpy_price': _jpy_price_from_twd(product.price),
             'name': product.jp_name or product.name,
             'description': product.jp_description,
             'category_name': product.category.jp_name or product.category.name,

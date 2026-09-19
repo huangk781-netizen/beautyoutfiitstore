@@ -1,9 +1,12 @@
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .models import Category, Product, ProductVideo
+from .views import _jpy_price_from_twd
 
 
 class JapanLandingQoo10Tests(TestCase):
@@ -19,6 +22,21 @@ class JapanLandingQoo10Tests(TestCase):
         }
         values.update(overrides)
         return Product.objects.create(**values)
+
+    def test_jpy_price_uses_exchange_rate_and_ends_in_90(self):
+        self.assertEqual(_jpy_price_from_twd(Decimal('18')), 90)
+        self.assertEqual(_jpy_price_from_twd(Decimal('18.90')), 90)
+        self.assertEqual(_jpy_price_from_twd(Decimal('21')), 190)
+        self.assertEqual(_jpy_price_from_twd(Decimal('500')), 2390)
+        self.assertEqual(_jpy_price_from_twd(Decimal('420')), 2090)
+
+    def test_japan_landing_displays_yen_price(self):
+        self.create_product(price=500)
+
+        response = self.client.get(reverse('japan_landing'))
+
+        self.assertContains(response, '¥2390')
+        self.assertNotContains(response, 'NT$ 500')
 
     def test_product_with_qoo10_url_links_to_listing(self):
         qoo10_url = 'https://www.qoo10.jp/g/123456789'

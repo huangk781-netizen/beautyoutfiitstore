@@ -97,7 +97,7 @@
           <div class="mt-3">
             <p class="text-xs text-accent">{{ card.category_name }}</p>
             <h3 class="mt-1 text-sm font-medium leading-6 text-neutral">{{ card.name }}</h3>
-            <p class="mt-1 text-sm text-accent">NT$ {{ card.product.price|floatformat:0 }}</p>
+            <p class="mt-1 text-sm text-accent">¥{{ card.jpy_price }}</p>
             {% if card.description %}
             <p class="mt-2 text-xs leading-5 text-neutral/75">{{ card.description|linebreaksbr }}</p>
             {% endif %}
